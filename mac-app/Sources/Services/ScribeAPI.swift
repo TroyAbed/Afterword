@@ -29,8 +29,15 @@ struct ScribeAPI {
     let baseURL: URL
     let token: String
 
-    private func request(_ path: String, method: String = "GET") -> URLRequest {
-        var r = URLRequest(url: baseURL.appending(path: path))
+    private func request(_ path: String, method: String = "GET",
+                         query: [URLQueryItem] = []) -> URLRequest {
+        var url = baseURL.appending(path: path)
+        if !query.isEmpty {
+            var c = URLComponents(url: url, resolvingAgainstBaseURL: false)!
+            c.queryItems = query
+            url = c.url!
+        }
+        var r = URLRequest(url: url)
         r.httpMethod = method
         if !token.isEmpty { r.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization") }
         return r
@@ -46,7 +53,8 @@ struct ScribeAPI {
 
     /// Upload the mic track (and, for meetings, the system-audio track); returns the created job.
     func submit(audio: URL, systemAudio: URL?, kind: SessionKind,
-                title: String, language: String, summaryModel: String) async throws -> JobMeta {
+                title: String, language: String,
+                summaryModel: String, ollamaURL: String) async throws -> JobMeta {
         let boundary = "scribe.\(UUID().uuidString)"
         var req = request("/jobs", method: "POST")
         req.setValue("multipart/form-data; boundary=\(boundary)", forHTTPHeaderField: "Content-Type")
@@ -68,6 +76,7 @@ struct ScribeAPI {
         field("title", title)
         field("language", language)
         field("summary_model", summaryModel)
+        field("ollama_url", ollamaURL)
         try file("audio", audio)
         if let systemAudio, FileManager.default.fileExists(atPath: systemAudio.path) {
             try file("system_audio", systemAudio)
@@ -86,13 +95,14 @@ struct ScribeAPI {
 
     /// Regenerate the summary with speaker names substituted. Returns the new summary markdown.
     func resummarize(jobID: String, speakers: [String: String],
-                     summaryModel: String) async throws -> String {
+                     summaryModel: String, ollamaURL: String) async throws -> String {
         let boundary = "scribe.\(UUID().uuidString)"
         var req = request("/jobs/\(jobID)/resummarize", method: "POST")
         req.setValue("multipart/form-data; boundary=\(boundary)", forHTTPHeaderField: "Content-Type")
         let json = String(data: try JSONEncoder().encode(speakers), encoding: .utf8) ?? "{}"
         var body = Data()
-        for (name, value) in [("speakers", json), ("summary_model", summaryModel)] {
+        for (name, value) in [("speakers", json), ("summary_model", summaryModel),
+                              ("ollama_url", ollamaURL)] {
             body.append("--\(boundary)\r\n")
             body.append("Content-Disposition: form-data; name=\"\(name)\"\r\n\r\n")
             body.append("\(value)\r\n")
@@ -115,8 +125,9 @@ struct ScribeAPI {
     }
 
     struct Models: Decodable { let available: [String]; let effective: String }
-    func models() async throws -> Models {
-        let (data, resp) = try await URLSession.shared.data(for: request("/models"))
+    func models(ollamaURL: String = "") async throws -> Models {
+        let q = ollamaURL.isEmpty ? [] : [URLQueryItem(name: "ollama_url", value: ollamaURL)]
+        let (data, resp) = try await URLSession.shared.data(for: request("/models", query: q))
         let code = (resp as? HTTPURLResponse)?.statusCode ?? 0
         guard (200..<300).contains(code) else { throw ScribeError.http(code, "") }
         return try JSONDecoder().decode(Models.self, from: data)

@@ -8,6 +8,8 @@ final class AppSettings: ObservableObject {
     @Published var language: String      { didSet { d.set(language, forKey: "language") } }
     /// "" = let the server decide (config default + auto-fallback)
     @Published var summaryModel: String  { didSet { d.set(summaryModel, forKey: "summaryModel") } }
+    /// Optional own Ollama endpoint for the summary step. "" = the server uses its own.
+    @Published var ollamaURL: String     { didSet { d.set(ollamaURL, forKey: "ollamaURL") } }
     /// "off" | "ask" | "auto" — what to do when a calendar meeting starts
     @Published var autoRecordMode: String { didSet { d.set(autoRecordMode, forKey: "autoRecordMode") } }
     /// Colorway.rawValue — swaps the palette, never the layout
@@ -24,6 +26,7 @@ final class AppSettings: ObservableObject {
         token = d.string(forKey: "token") ?? ""
         language = d.string(forKey: "language") ?? "de"
         summaryModel = d.string(forKey: "summaryModel") ?? ""
+        ollamaURL = d.string(forKey: "ollamaURL") ?? ""
         autoRecordMode = d.string(forKey: "autoRecordMode") ?? "ask"
         colorway = d.string(forKey: "colorway") ?? Colorway.schwefel.rawValue
         appearance = d.string(forKey: "appearance") ?? Appearance.system.rawValue

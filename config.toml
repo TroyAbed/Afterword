@@ -13,7 +13,7 @@ language = "de"             # de / en / "" for auto-detect
 initial_prompt = "Gespräch auf Deutsch mit Schweizer Bezug: Alp, Älpler, Sennerei, kWp, Dachpacht, Photovoltaik."
 
 [summary]
-ollama_url = "http://localhost:11434"   # local on the Studio
+ollama_url = "http://localhost:11434"   # default; the app can override this per job
 ollama_model = "gpt-oss:20b"            # best for this; re-pull if removed
 # used in order if ollama_model isn't on the Studio (models get cleaned up there)
 fallback_models = ["gpt-oss:20b", "qwen3:14b", "qwen3:8b", "gemma3:12b", "qwen3-coder:30b", "qwen3.8:27b-mlx"]

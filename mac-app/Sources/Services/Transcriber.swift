@@ -80,7 +80,8 @@ final class Transcriber: ObservableObject {
             defer { resummarizing.remove(id) }
             do {
                 let summary = try await api.resummarize(
-                    jobID: jid, speakers: s.speakerNames, summaryModel: settings.summaryModel)
+                    jobID: jid, speakers: s.speakerNames,
+                    summaryModel: settings.summaryModel, ollamaURL: settings.ollamaURL)
                 guard var cur = store.session(id) else { return }
                 cur.summaryMarkdown = summary
                 if cur.status == .error {          // summary was the only thing missing
@@ -137,7 +138,7 @@ final class Transcriber: ObservableObject {
             let created = try await api.submit(
                 audio: audio, systemAudio: sysURL, kind: s.kind,
                 title: s.title, language: settings.language,
-                summaryModel: settings.summaryModel)
+                summaryModel: settings.summaryModel, ollamaURL: settings.ollamaURL)
             s.serverJobID = created.id
             s.status = .processing
             store.save(s)

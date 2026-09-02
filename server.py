@@ -70,11 +70,12 @@ async def health() -> dict:
 
 
 @app.get("/models", dependencies=[Depends(auth)])
-async def models() -> dict:
-    """Ollama models on the Studio + which one "Server-Standard" resolves to now."""
+async def models(ollama_url: str = "") -> dict:
+    """Ollama models + which one "Automatic" resolves to now.
+    Pass ?ollama_url= to inspect a different Ollama than the server's own."""
+    base = (ollama_url or CFG["summary"]["ollama_url"]).rstrip("/")
     try:
-        raw = urllib.request.urlopen(
-            CFG["summary"]["ollama_url"].rstrip("/") + "/api/tags", timeout=10).read()
+        raw = urllib.request.urlopen(base + "/api/tags", timeout=10).read()
         avail = sorted(m["name"] for m in json.loads(raw).get("models", []))
     except Exception:  # noqa: BLE001
         avail = []
@@ -92,6 +93,7 @@ async def create_job(
     language: str = Form(""),
     speakers: str = Form("{}"),
     summary_model: str = Form(""),
+    ollama_url: str = Form(""),
     system_audio: UploadFile | None = File(None),
 ) -> dict:
     jid = datetime.now().strftime("%Y%m%d-%H%M%S-") + secrets.token_hex(3)
@@ -114,6 +116,7 @@ async def create_job(
         "id": jid, "kind": kind, "title": title or jid,
         "language": language, "speakers": json.loads(speakers or "{}"),
         "summary_model": summary_model or None,
+        "ollama_url": ollama_url or None,
         "audio": apath.name, "system_audio": spath.name if spath else None,
         "status": "queued", "created_at": _now(),
     }
@@ -147,7 +150,8 @@ async def get_job(jid: str) -> dict:
 
 @app.post("/jobs/{jid}/resummarize", dependencies=[Depends(auth)])
 async def resummarize(jid: str, speakers: str = Form("{}"),
-                      summary_model: str = Form("")) -> dict:
+                      summary_model: str = Form(""),
+                      ollama_url: str = Form("")) -> dict:
     """Regenerate the summary (used after labelling speakers or a failed run)."""
     import asyncio
     d = _dir(jid)
@@ -161,6 +165,8 @@ async def resummarize(jid: str, speakers: str = Form("{}"),
     cfg = json.loads(json.dumps(CFG))
     if summary_model:
         cfg["summary"]["ollama_model"] = summary_model
+    if ollama_url:
+        cfg["summary"]["ollama_url"] = ollama_url
     summary = await asyncio.to_thread(pipeline.summarize, text, cfg)
     (d / "summary.md").write_text(summary)
     m = _meta(jid)
@@ -223,6 +229,8 @@ def _worker() -> None:
                 cfg["transcribe"]["language"] = m["language"]
             if m.get("summary_model"):
                 cfg["summary"]["ollama_model"] = m["summary_model"]
+            if m.get("ollama_url"):
+                cfg["summary"]["ollama_url"] = m["ollama_url"]
 
             secondary = d / m["system_audio"] if m.get("system_audio") else None
 

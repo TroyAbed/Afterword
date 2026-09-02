@@ -88,19 +88,25 @@ struct SettingsView: View {
             }
 
             Section("Protokoll-Modell (Ollama)") {
+                TextField("Ollama-Server", text: $settings.ollamaURL,
+                          prompt: Text("Server-Standard"))
+                    .onSubmit { loadModels() }
+                Text("Leer = der Afterword-Server nutzt sein eigenes Ollama. Trag hier z.B. http://192.168.1.20:11434 ein, um ein anderes zu verwenden.")
+                    .font(.caption).foregroundStyle(.secondary)
+
                 Picker("Modell", selection: $settings.summaryModel) {
                     Text(effective.isEmpty ? "Automatisch" : "Automatisch (\(effective))").tag("")
                     if !models.isEmpty { Divider() }
                     ForEach(models, id: \.self) { Text($0).tag($0) }
                     if !settings.summaryModel.isEmpty && !models.contains(settings.summaryModel) {
-                        Text("\(settings.summaryModel) (nicht auf dem Studio)").tag(settings.summaryModel)
+                        Text("\(settings.summaryModel) (nicht verfügbar)").tag(settings.summaryModel)
                     }
                 }
                 HStack {
                     Button("Modelle laden") { loadModels() }.disabled(loadingModels)
                     if loadingModels { ProgressView().controlSize(.small) }
                 }
-                Text("Automatisch wählt ein vorhandenes Modell und weicht aus, wenn eins entfernt wird.")
+                Text("Automatisch wählt ein installiertes Modell und weicht aus, wenn eins entfernt wird.")
                     .font(.caption).foregroundStyle(.secondary)
             }
 
@@ -152,7 +158,7 @@ struct SettingsView: View {
         guard let api, !loadingModels else { return }
         loadingModels = true
         Task {
-            if let info = try? await api.models() {
+            if let info = try? await api.models(ollamaURL: settings.ollamaURL) {
                 models = info.available
                 effective = info.effective
             }

@@ -93,6 +93,11 @@ config.toml` + the plist into `~/whisper-service/app/`, then boots the service.
 → `summarize` → status `done`. Errors store `error` + `traceback` in `meta.json`.
 On boot, `queued`/`running` jobs are re-queued.
 
+`POST /jobs` / `/jobs/{id}/resummarize` accept an optional `ollama_url` form
+field (and `/models` an `?ollama_url=` query) — the app exposes it as
+**Einstellungen → Protokoll-Modell → Ollama-Server** so a user can point the
+summary step at their own Ollama. Empty falls back to `config.toml`.
+
 The client's summary shows `SPEAKER_00` etc.; names are swapped **client-side** on
 every render (`Session.applySpeakerNames`) — instant, no LLM re-run. This was the
 user's idea and it is better than the resummarize approach. `resummarize` is kept

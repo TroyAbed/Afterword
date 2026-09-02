@@ -146,6 +146,10 @@ Sechs Farbwege (Schwefel ist Standard), hell/dunkel/System, deutsche oder
 englische Oberfläche — alles in **Einstellungen** (⌘, oder das Zahnrad unten in
 der Seitenleiste).
 
+Das **Ollama für das Protokoll** ist in den Einstellungen frei eintragbar
+(`Protokoll-Modell → Ollama-Server`) — leer heisst „der Studio nutzt sein
+eigenes", sonst wird die Summary-Anfrage an die angegebene Adresse geschickt.
+
 Aufnahmen liegen im Sandbox-Container:
 `~/Library/Containers/com.troyabed.Afterword/Data/Library/Application Support/Afterword/Sessions/`.
 

@@ -111,3 +111,7 @@
 "Sprache" = "Language";
 "Oberfläche" = "Interface";
 "Die Oberfläche wechselt sofort. Die gesprochene Sprache sagt dem Server, was er transkribieren soll." = "The interface switches immediately. The spoken language tells the server what to transcribe.";
+"Ollama-Server" = "Ollama server";
+"Server-Standard" = "Server default";
+"Leer = der Afterword-Server nutzt sein eigenes Ollama. Trag hier z.B. http://192.168.1.20:11434 ein, um ein anderes zu verwenden." = "Empty = the Afterword server uses its own Ollama. Enter e.g. http://192.168.1.20:11434 here to use a different one.";
+"Automatisch wählt ein installiertes Modell und weicht aus, wenn eins entfernt wird." = "Automatic picks an installed model and falls back when one is removed.";
