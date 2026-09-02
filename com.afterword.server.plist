@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!-- Optional: auto-start the service on the Mac Studio.
+     Install:  cp com.afterword.server.plist ~/Library/LaunchAgents/
+               launchctl load ~/Library/LaunchAgents/com.afterword.server.plist
+     Remove:   launchctl unload ~/Library/LaunchAgents/com.afterword.server.plist
+               rm ~/Library/LaunchAgents/com.afterword.server.plist
+     Adjust the /Users/maurusronner paths if the account name differs. -->
+<plist version="1.0">
+<dict>
+  <key>Label</key><string>com.afterword.server</string>
+  <key>ProgramArguments</key>
+  <array>
+    <string>/Users/maurusronner/whisper-service/.venv/bin/uvicorn</string>
+    <string>server:app</string>
+    <string>--host</string><string>0.0.0.0</string>
+    <string>--port</string><string>8756</string>
+  </array>
+  <key>WorkingDirectory</key><string>/Users/maurusronner/whisper-service/app</string>
+  <key>EnvironmentVariables</key>
+  <dict>
+    <key>PATH</key><string>/opt/homebrew/bin:/usr/bin:/bin</string>
+    <key>HF_HOME</key><string>/Users/maurusronner/whisper-service/models/huggingface</string>
+    <key>TORCH_HOME</key><string>/Users/maurusronner/whisper-service/models/torch</string>
+    <key>HF_HUB_OFFLINE</key><string>1</string>
+  </dict>
+  <key>RunAtLoad</key><true/>
+  <key>KeepAlive</key><true/>
+  <key>StandardOutPath</key><string>/Users/maurusronner/whisper-service/server.log</string>
+  <key>StandardErrorPath</key><string>/Users/maurusronner/whisper-service/server.log</string>
+</dict>
+</plist>

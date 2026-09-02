@@ -1,0 +1,223 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <style>
+    body { margin: 0; font-family: -apple-system, "SF Pro Text", system-ui, sans-serif; }
+    a { color: #8A6A00; } a:hover { color: #6B5200; }
+  </style>
+</helmet>
+
+<div style="width: 600px; height: 1020px; box-sizing: border-box; padding: 30px; background: radial-gradient(120% 90% at 22% 8%, #DAD3C1 0%, #C3BCA9 55%, #ADA694 100%)">
+  <div style="width: 540px; height: 960px; box-sizing: border-box; border-radius: 14px; overflow: hidden; background: rgba(253,251,246,0.80); backdrop-filter: blur(34px) saturate(180%); box-shadow: 0 26px 60px rgba(40,34,20,0.28), 0 0 0 0.5px rgba(23,21,15,0.14), inset 0 0.5px 0 rgba(255,255,255,0.75); display: flex; flex-direction: column">
+
+    <div style="height: 46px; flex-shrink: 0; display: flex; align-items: center; gap: 14px; padding: 0 18px">
+      <div style="display: flex; gap: 8px">
+        <div style="width: 12px; height: 12px; border-radius: 50%; background: #ED6A5E"></div>
+        <div style="width: 12px; height: 12px; border-radius: 50%; background: #F4BF4F"></div>
+        <div style="width: 12px; height: 12px; border-radius: 50%; background: #61C554"></div>
+      </div>
+      <div style="flex-grow: 1; text-align: center; font-size: 13px; font-weight: 600; color: #17150F; margin-left: -60px">Einstellungen</div>
+    </div>
+
+    <div style="flex-grow: 1; min-height: 0; padding: 4px 20px 20px 20px; display: flex; flex-direction: column; gap: 16px">
+
+      <div style="display: flex; flex-direction: column; gap: 7px">
+        <div style="font-size: 11.5px; font-weight: 600; color: #6E6A5C; padding-left: 4px">Darstellung</div>
+        <div style="border-radius: 11px; background: rgba(255,255,255,0.72); box-shadow: 0 0 0 0.5px rgba(23,21,15,0.09), 0 1px 2px rgba(40,34,20,0.06)">
+
+          <div style="padding: 14px; display: flex; flex-direction: column; gap: 12px">
+            <div style="font-size: 12.5px; font-weight: 500; color: #17150F">Farbweg</div>
+            <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px">
+
+              <div style="display: flex; flex-direction: column; gap: 6px; align-items: center">
+                <div style="width: 100%; height: 58px; border-radius: 9px; overflow: hidden; background: #FFFDF5; box-shadow: 0 0 0 2.5px #FFC400, 0 0 0 3px rgba(23,21,15,0.10); display: flex; flex-direction: column">
+                  <div style="height: 13px; background: rgba(247,243,234,0.9); border-bottom: 0.5px solid rgba(23,21,15,0.08)"></div>
+                  <div style="flex-grow: 1; display: flex; padding: 5px; gap: 5px">
+                    <div style="width: 22px; border-radius: 4px; background: rgba(247,243,234,0.95)"></div>
+                    <div style="flex-grow: 1; display: flex; flex-direction: column; gap: 4px">
+                      <div style="height: 4px; width: 80%; border-radius: 2px; background: rgba(23,21,15,0.55)"></div>
+                      <div style="height: 9px; width: 55%; border-radius: 4px; background: #FFC400"></div>
+                    </div>
+                  </div>
+                </div>
+                <div style="font-size: 11px; font-weight: 600; color: #17150F">Schwefel</div>
+              </div>
+
+              <div style="display: flex; flex-direction: column; gap: 6px; align-items: center">
+                <div style="width: 100%; height: 58px; border-radius: 9px; overflow: hidden; background: #FFFFFF; box-shadow: 0 0 0 0.5px rgba(23,21,15,0.14); display: flex; flex-direction: column">
+                  <div style="height: 13px; background: #F4F4F4; border-bottom: 0.5px solid rgba(17,17,17,0.08)"></div>
+                  <div style="flex-grow: 1; display: flex; padding: 5px; gap: 5px">
+                    <div style="width: 22px; border-radius: 4px; background: #F4F4F4"></div>
+                    <div style="flex-grow: 1; display: flex; flex-direction: column; gap: 4px">
+                      <div style="height: 4px; width: 80%; border-radius: 2px; background: rgba(17,17,17,0.55)"></div>
+                      <div style="height: 9px; width: 55%; border-radius: 4px; background: #D8F235"></div>
+                    </div>
+                  </div>
+                </div>
+                <div style="font-size: 11px; color: #3B372C">Säure</div>
+              </div>
+
+              <div style="display: flex; flex-direction: column; gap: 6px; align-items: center">
+                <div style="width: 100%; height: 58px; border-radius: 9px; overflow: hidden; background: #FFFFFF; box-shadow: 0 0 0 0.5px rgba(23,21,15,0.14); display: flex; flex-direction: column">
+                  <div style="height: 13px; background: #F4F2F0; border-bottom: 0.5px solid rgba(17,17,17,0.08)"></div>
+                  <div style="flex-grow: 1; display: flex; padding: 5px; gap: 5px">
+                    <div style="width: 22px; border-radius: 4px; background: #F4F2F0"></div>
+                    <div style="flex-grow: 1; display: flex; flex-direction: column; gap: 4px">
+                      <div style="height: 4px; width: 80%; border-radius: 2px; background: rgba(17,17,17,0.55)"></div>
+                      <div style="height: 9px; width: 55%; border-radius: 4px; background: #FF4D1F"></div>
+                    </div>
+                  </div>
+                </div>
+                <div style="font-size: 11px; color: #3B372C">Zinnober</div>
+              </div>
+
+              <div style="display: flex; flex-direction: column; gap: 6px; align-items: center">
+                <div style="width: 100%; height: 58px; border-radius: 9px; overflow: hidden; background: #F5F3EE; box-shadow: 0 0 0 0.5px rgba(23,21,15,0.14); display: flex; flex-direction: column">
+                  <div style="height: 13px; background: #E7E4DD; border-bottom: 0.5px solid rgba(20,22,26,0.08)"></div>
+                  <div style="flex-grow: 1; display: flex; padding: 5px; gap: 5px">
+                    <div style="width: 22px; border-radius: 4px; background: #E7E4DD"></div>
+                    <div style="flex-grow: 1; display: flex; flex-direction: column; gap: 4px">
+                      <div style="height: 4px; width: 80%; border-radius: 2px; background: rgba(20,22,26,0.55)"></div>
+                      <div style="height: 9px; width: 55%; border-radius: 4px; background: #B7410E"></div>
+                    </div>
+                  </div>
+                </div>
+                <div style="font-size: 11px; color: #3B372C">Blei &amp; Rost</div>
+              </div>
+
+              <div style="display: flex; flex-direction: column; gap: 6px; align-items: center">
+                <div style="width: 100%; height: 58px; border-radius: 9px; overflow: hidden; background: #FAFAF8; box-shadow: 0 0 0 0.5px rgba(23,21,15,0.14); display: flex; flex-direction: column">
+                  <div style="height: 13px; background: #EDEDEA; border-bottom: 0.5px solid rgba(16,20,24,0.08)"></div>
+                  <div style="flex-grow: 1; display: flex; padding: 5px; gap: 5px">
+                    <div style="width: 22px; border-radius: 4px; background: #EDEDEA"></div>
+                    <div style="flex-grow: 1; display: flex; flex-direction: column; gap: 4px">
+                      <div style="height: 4px; width: 80%; border-radius: 2px; background: rgba(16,20,24,0.55)"></div>
+                      <div style="height: 9px; width: 55%; border-radius: 4px; background: #1A4DFF"></div>
+                    </div>
+                  </div>
+                </div>
+                <div style="font-size: 11px; color: #3B372C">Signalblau</div>
+              </div>
+
+              <div style="display: flex; flex-direction: column; gap: 6px; align-items: center">
+                <div style="width: 100%; height: 58px; border-radius: 9px; overflow: hidden; background: #FCFAFB; box-shadow: 0 0 0 0.5px rgba(23,21,15,0.14); display: flex; flex-direction: column">
+                  <div style="height: 13px; background: #F1EDEF; border-bottom: 0.5px solid rgba(14,14,16,0.08)"></div>
+                  <div style="flex-grow: 1; display: flex; padding: 5px; gap: 5px">
+                    <div style="width: 22px; border-radius: 4px; background: #F1EDEF"></div>
+                    <div style="flex-grow: 1; display: flex; flex-direction: column; gap: 4px">
+                      <div style="height: 4px; width: 80%; border-radius: 2px; background: rgba(14,14,16,0.55)"></div>
+                      <div style="height: 9px; width: 55%; border-radius: 4px; background: #FF2D6F"></div>
+                    </div>
+                  </div>
+                </div>
+                <div style="font-size: 11px; color: #3B372C">Magenta</div>
+              </div>
+
+            </div>
+          </div>
+
+          <div style="height: 0.5px; background: rgba(23,21,15,0.10); margin-left: 14px"></div>
+
+          <div style="padding: 11px 14px; display: flex; align-items: center; gap: 12px">
+            <div style="font-size: 12.5px; font-weight: 500; color: #17150F">Erscheinung</div>
+            <div style="flex-grow: 1"></div>
+            <div style="display: flex; padding: 2px; border-radius: 8px; background: rgba(23,21,15,0.06)">
+              <div style="font-size: 11.5px; font-weight: 600; color: #17150F; padding: 3px 12px; border-radius: 6px; background: #FFFFFF; box-shadow: 0 1px 2px rgba(40,34,20,0.13)">Hell</div>
+              <div style="font-size: 11.5px; color: #6E6A5C; padding: 3px 12px">Dunkel</div>
+              <div style="font-size: 11.5px; color: #6E6A5C; padding: 3px 12px">System</div>
+            </div>
+          </div>
+        </div>
+        <div style="font-size: 11px; line-height: 1.45; color: #9A9584; padding-left: 4px">Der Farbweg tauscht nur Akzent und Flächen — Layout und Schrift bleiben gleich.</div>
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 7px">
+        <div style="font-size: 11.5px; font-weight: 600; color: #6E6A5C; padding-left: 4px">Server (Mac Studio)</div>
+        <div style="border-radius: 11px; background: rgba(255,255,255,0.72); box-shadow: 0 0 0 0.5px rgba(23,21,15,0.09), 0 1px 2px rgba(40,34,20,0.06)">
+          <div style="padding: 9px 14px; display: flex; align-items: center; gap: 12px">
+            <div style="font-size: 12.5px; color: #17150F; width: 96px">URL</div>
+            <div style="flex-grow: 1; border-radius: 7px; background: rgba(23,21,15,0.05); box-shadow: inset 0 0 0 0.5px rgba(23,21,15,0.10); padding: 5px 9px; font-size: 12px; color: #17150F">http://maxpi:8756</div>
+          </div>
+          <div style="height: 0.5px; background: rgba(23,21,15,0.10); margin-left: 14px"></div>
+          <div style="padding: 9px 14px; display: flex; align-items: center; gap: 12px">
+            <div style="font-size: 12.5px; color: #17150F; width: 96px">Token</div>
+            <div style="flex-grow: 1; border-radius: 7px; background: rgba(23,21,15,0.05); box-shadow: inset 0 0 0 0.5px rgba(23,21,15,0.10); padding: 5px 9px; font-size: 12px; color: #9A9584; letter-spacing: 0.18em">••••••••</div>
+          </div>
+          <div style="height: 0.5px; background: rgba(23,21,15,0.10); margin-left: 14px"></div>
+          <div style="padding: 9px 14px; display: flex; align-items: center; gap: 11px">
+            <div style="font-size: 12px; font-weight: 500; color: #17150F; padding: 4px 12px; border-radius: 7px; background: rgba(255,255,255,0.9); box-shadow: 0 0 0 0.5px rgba(23,21,15,0.14), 0 1px 2px rgba(40,34,20,0.10)">Verbindung testen</div>
+            <div style="display: flex; align-items: center; gap: 6px; font-size: 12px; color: #3B372C">
+              <div style="width: 8px; height: 8px; border-radius: 50%; background: #34A853"></div>
+              erreichbar
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 7px">
+        <div style="font-size: 11.5px; font-weight: 600; color: #6E6A5C; padding-left: 4px">Transkription &amp; Kalender</div>
+        <div style="border-radius: 11px; background: rgba(255,255,255,0.72); box-shadow: 0 0 0 0.5px rgba(23,21,15,0.09), 0 1px 2px rgba(40,34,20,0.06)">
+          <div style="padding: 9px 14px; display: flex; align-items: center; gap: 12px">
+            <div style="font-size: 12.5px; color: #17150F; width: 150px">Sprache</div>
+            <div style="flex-grow: 1; display: flex; align-items: center; justify-content: space-between; border-radius: 7px; background: rgba(255,255,255,0.9); box-shadow: 0 0 0 0.5px rgba(23,21,15,0.14), 0 1px 2px rgba(40,34,20,0.08); padding: 5px 9px; font-size: 12px; color: #17150F">
+              Deutsch
+              <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="#6E6A5C" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><path d="M6 10l6 6 6-6"></path></svg>
+            </div>
+          </div>
+          <div style="height: 0.5px; background: rgba(23,21,15,0.10); margin-left: 14px"></div>
+          <div style="padding: 9px 14px; display: flex; align-items: center; gap: 12px">
+            <div style="font-size: 12.5px; color: #17150F; width: 150px">Wenn ein Meeting beginnt</div>
+            <div style="flex-grow: 1; display: flex; align-items: center; justify-content: space-between; border-radius: 7px; background: rgba(255,255,255,0.9); box-shadow: 0 0 0 0.5px rgba(23,21,15,0.14), 0 1px 2px rgba(40,34,20,0.08); padding: 5px 9px; font-size: 12px; color: #17150F">
+              Nachfragen
+              <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="#6E6A5C" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><path d="M6 10l6 6 6-6"></path></svg>
+            </div>
+          </div>
+          <div style="height: 0.5px; background: rgba(23,21,15,0.10); margin-left: 14px"></div>
+          <div style="padding: 9px 14px; font-size: 11px; line-height: 1.45; color: #9A9584">Gilt nur für Termine mit Meeting-Link. Die Aufnahme stoppt, wenn das Fenster verschwindet. Denk daran, sie den Teilnehmenden anzusagen.</div>
+        </div>
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 7px">
+        <div style="font-size: 11.5px; font-weight: 600; color: #6E6A5C; padding-left: 4px">Protokoll-Modell (Ollama)</div>
+        <div style="border-radius: 11px; background: rgba(255,255,255,0.72); box-shadow: 0 0 0 0.5px rgba(23,21,15,0.09), 0 1px 2px rgba(40,34,20,0.06)">
+          <div style="padding: 9px 14px; display: flex; align-items: center; gap: 12px">
+            <div style="font-size: 12.5px; color: #17150F; width: 96px">Modell</div>
+            <div style="flex-grow: 1; display: flex; align-items: center; justify-content: space-between; border-radius: 7px; background: rgba(255,255,255,0.9); box-shadow: 0 0 0 0.5px rgba(23,21,15,0.14), 0 1px 2px rgba(40,34,20,0.08); padding: 5px 9px; font-size: 12px; color: #17150F">
+              Automatisch (gpt-oss:20b)
+              <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="#6E6A5C" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><path d="M6 10l6 6 6-6"></path></svg>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 7px">
+        <div style="font-size: 11.5px; font-weight: 600; color: #6E6A5C; padding-left: 4px">Gespeicherte Stimmen</div>
+        <div style="border-radius: 11px; background: rgba(255,255,255,0.72); box-shadow: 0 0 0 0.5px rgba(23,21,15,0.09), 0 1px 2px rgba(40,34,20,0.06)">
+          <div style="padding: 9px 14px; display: flex; align-items: center; gap: 9px">
+            <div style="font-size: 12.5px; font-weight: 500; color: #17150F">Luca</div>
+            <div style="font-size: 11.5px; color: #9A9584">4 Aufnahmen</div>
+            <div style="flex-grow: 1"></div>
+            <div style="width: 20px; height: 20px; border-radius: 50%; background: rgba(23,21,15,0.06); display: flex; align-items: center; justify-content: center; font-size: 12px; color: #6E6A5C; letter-spacing: 0.06em">…</div>
+          </div>
+          <div style="height: 0.5px; background: rgba(23,21,15,0.10); margin-left: 14px"></div>
+          <div style="padding: 9px 14px; display: flex; align-items: center; gap: 9px">
+            <div style="font-size: 12.5px; font-weight: 500; color: #17150F">Marco</div>
+            <div style="font-size: 11.5px; color: #9A9584">1 Aufnahme</div>
+            <div style="flex-grow: 1"></div>
+            <div style="width: 20px; height: 20px; border-radius: 50%; background: rgba(23,21,15,0.06); display: flex; align-items: center; justify-content: center; font-size: 12px; color: #6E6A5C; letter-spacing: 0.06em">…</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+</x-dc>
+</body>
+</html>

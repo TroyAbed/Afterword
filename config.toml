@@ -1,0 +1,41 @@
+# Afterword — runs on the Mac Studio (M2 Ultra), inside ~/whisper-service/.venv
+
+[transcribe]
+# ASR runs on mlx-whisper (Metal). large-v3 = best German quality; swap to
+# "mlx-community/whisper-large-v3-turbo" for ~2x speed at a small quality cost.
+mlx_model = "mlx-community/whisper-large-v3-mlx"
+diarize_model = "pyannote/speaker-diarization-community-1"
+language = "de"             # de / en / "" for auto-detect
+# constrain diarization if you know the headcount — improves accuracy
+# min_speakers = 2
+# max_speakers = 6
+# bias vocabulary — helps with CH terms and recurring names it keeps mis-spelling
+initial_prompt = "Gespräch auf Deutsch mit Schweizer Bezug: Alp, Älpler, Sennerei, kWp, Dachpacht, Photovoltaik."
+
+[summary]
+ollama_url = "http://localhost:11434"   # local on the Studio
+ollama_model = "gpt-oss:20b"            # best for this; re-pull if removed
+# used in order if ollama_model isn't on the Studio (models get cleaned up there)
+fallback_models = ["gpt-oss:20b", "qwen3:14b", "qwen3:8b", "gemma3:12b", "qwen3-coder:30b", "qwen3.8:27b-mlx"]
+num_ctx = 32768
+temperature = 0.2
+prompt = """Du bist ein sorgfältiger Protokollführer. Unten steht das wörtliche, \
+nach Sprechern getrennte Transkript eines Meetings.
+
+WICHTIG: Bezeichne Personen ausschliesslich mit ihrem exakten Kürzel wie \
+SPEAKER_00, SPEAKER_01 usw. — genau so geschrieben. Erfinde keine Namen, schreibe \
+nicht „Sprecher 1" oder „die erste Person". Die Kürzel werden später ersetzt.
+
+Erstelle ein knappes deutsches Protokoll mit genau diesen Abschnitten:
+- **Kontext** — worum ging es (1–2 Sätze)
+- **Kernpunkte** — die wichtigsten besprochenen Punkte, als Stichpunkte
+- **Entscheidungen** — was wurde entschieden
+- **Offene Punkte** — was blieb ungeklärt
+- **To-dos** — konkrete Aufgaben, je mit Verantwortlichem und (falls genannt) Frist
+
+Erfinde nichts. Wenn ein Abschnitt leer ist, schreib „–"."""
+
+[voices]
+# cosine similarity above which a diarised speaker is auto-labelled with a saved
+# voice. Higher = fewer false matches, more "unknown". Tune after enrolling a few.
+match_threshold = 0.62

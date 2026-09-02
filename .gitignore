@@ -1,0 +1,24 @@
+.DS_Store
+
+# Python
+*.pyc
+__pycache__/
+.venv/
+venv/
+
+# Xcode — the project is generated from project.yml by xcodegen
+*.xcodeproj/
+build/
+DerivedData/
+*.xcuserstate
+
+# runtime state (lives on the Studio / Pi, never in the repo)
+token.txt
+speakers.json
+/voices/
+/data/
+/inbox/
+/output/
+
+# regenerable design-canvas output — source is design/*.dc.html + canvas.json
+design/afterword-identitaet.html

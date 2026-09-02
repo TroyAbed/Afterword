@@ -1,0 +1,34 @@
+name: Afterword
+options:
+  bundleIdPrefix: com.troyabed
+  developmentLanguage: de
+  deploymentTarget:
+    macOS: "14.0"
+  createIntermediateGroups: true
+settings:
+  base:
+    SWIFT_VERSION: "5.9"
+    MARKETING_VERSION: "0.1"
+    CURRENT_PROJECT_VERSION: "1"
+    GENERATE_INFOPLIST_FILE: YES
+    INFOPLIST_KEY_NSMicrophoneUsageDescription: "Afterword nimmt Audio für Transkripte auf."
+    INFOPLIST_KEY_NSCalendarsFullAccessUsageDescription: "Afterword liest deinen Kalender, um laufende Meetings zu erkennen und Aufnahmen zu benennen."
+    INFOPLIST_KEY_CFBundleDisplayName: Afterword
+    ENABLE_HARDENED_RUNTIME: YES
+    ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+targets:
+  Afterword:
+    type: application
+    platform: macOS
+    sources:
+      - Sources
+      - path: Resources/de.lproj
+        type: folder
+      - path: Resources/en.lproj
+        type: folder
+      - Resources/Assets.xcassets
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.troyabed.Afterword
+        CODE_SIGN_ENTITLEMENTS: Sources/Afterword.entitlements
+        CODE_SIGN_STYLE: Automatic

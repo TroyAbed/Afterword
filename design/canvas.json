@@ -1,0 +1,18 @@
+{
+  "artboards": [
+    { "file": "Main.dc.html", "x": 0, "y": 0, "w": 1240, "h": 900, "title": "Hauptfenster" },
+    { "file": "Einstellungen.dc.html", "x": 1360, "y": 0, "w": 600, "h": 1020, "title": "Einstellungen — Darstellung" },
+    { "file": "Farbwege.dc.html", "x": 0, "y": 1140, "w": 940, "h": 820, "title": "Farbwege, hell und dunkel" },
+    { "file": "Aufnahme.dc.html", "x": 1060, "y": 1140, "w": 480, "h": 660, "title": "Aufnahme läuft" }
+  ],
+  "annotations": [
+    {
+      "id": "richtung",
+      "x": 0,
+      "y": -170,
+      "w": 660,
+      "text": "Afterword — native macOS-Hülle: Rundungen, Materialien und Systemsteuerelemente von Apple.\nEigen bleiben Schwefel als Akzent, die Marke im Balken, die Grossbuchstaben-Zwischentitel und das Farbwegsystem (sechs Paletten, hell/dunkel)."
+    }
+  ],
+  "launch": { "view": "canvas" }
+}
