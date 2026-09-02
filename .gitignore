@@ -22,3 +22,4 @@ speakers.json
 
 # regenerable design-canvas output — source is design/*.dc.html + canvas.json
 design/afterword-identitaet.html
+dist/
