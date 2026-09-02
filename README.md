@@ -169,6 +169,29 @@ Ruhezustand abschalten.
 Nicht-öffentliche Gespräche in der Schweiz aufzunehmen braucht die Zustimmung
 aller Beteiligten (Art. 179bis / 179ter StGB). Die Aufnahme ansagen.
 
+## Release / Download
+
+Die App wird nicht ins Repo eingecheckt — sie hängt als `.dmg` an einem
+**GitHub-Release**.
+
+```bash
+./release.sh 0.2            # baut Release + .dmg, taggt v0.2, lädt es hoch (gh auth nötig)
+./release.sh 0.2 --dmg-only # nur die .dmg nach dist/, kein Release
+```
+
+Von Hand geht es auch: `dist/Afterword-<ver>.dmg` bauen (`./release.sh <ver> --dmg-only`),
+dann auf github.com → **Releases → Draft a new release**, Tag `v<ver>`, die `.dmg`
+in „Attach binaries" ziehen, **Publish**.
+
+Installieren: `.dmg` öffnen, App nach „Programme" ziehen. Die App ist ad-hoc
+signiert (kein bezahlter Apple-Developer-Account), also einmalig:
+
+```bash
+xattr -dr com.apple.quarantine /Applications/Afterword.app
+```
+
+Danach normal öffnen. Server-URL in **Einstellungen → Server** setzen.
+
 ## Design-Canvas
 
 <https://claude.ai/code/artifact/7ddbc5bb-b1e0-4a2c-ba83-96a4c9a8b675>
