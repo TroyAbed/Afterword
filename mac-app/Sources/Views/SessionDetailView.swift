@@ -98,6 +98,10 @@ struct SessionDetailView: View {
         .task(id: session.id) {
             player.load(audioURLs: audioURLs, videoURL: videoURL)
             keyFocus = true
+            if let req = navigator.seekRequest, req.session == session.id {
+                tab = .transcript
+                player.seek(to: req.time)
+            }
         }
         .onDisappear { player.stop() }
         .toolbar { actions }
@@ -406,6 +410,7 @@ struct SessionDetailView: View {
 /// jump back to the live position.
 struct TranscriptView: View {
     @EnvironmentObject var store: SessionStore
+    @EnvironmentObject var navigator: Navigator
     @Environment(\.palette) private var palette
     let session: Session
     @ObservedObject var player: SessionPlayer
@@ -413,6 +418,30 @@ struct TranscriptView: View {
     @State private var following = true
     @State private var programmatic = false
     @State private var lastActiveID: String?
+    /// the segment a search-result click asked us to jump to — flashed briefly
+    @State private var flashID: String?
+    @State private var flashWork: DispatchWorkItem?
+
+    /// The segment nearest a given time (contains it, else the last one before).
+    private func segmentID(near t: TimeInterval) -> String? {
+        if let hit = session.segments.first(where: { $0.contains(t) }) { return hit.id }
+        return session.segments.last(where: { $0.startTime <= t + 0.01 })?.id
+            ?? session.segments.first?.id
+    }
+
+    private func jump(to req: Navigator.SeekRequest, _ proxy: ScrollViewProxy) {
+        guard req.session == session.id, let id = segmentID(near: req.time) else { return }
+        following = false
+        // defer so it also works the moment the tab/view is first laid out
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
+            scroll(to: id, proxy)
+        }
+        flashID = id
+        flashWork?.cancel()
+        let work = DispatchWorkItem { withAnimation { flashID = nil } }
+        flashWork = work
+        DispatchQueue.main.asyncAfter(deadline: .now() + 2.4, execute: work)
+    }
 
     private var activeID: String? {
         session.segments.first { $0.contains(player.currentTime) }?.id
@@ -455,6 +484,12 @@ struct TranscriptView: View {
             .onChange(of: player.isPlaying) { _, playing in
                 if playing { following = true }
             }
+            .onChange(of: navigator.seekRequest) { _, req in
+                if let req { jump(to: req, proxy) }
+            }
+            .onAppear {
+                if let req = navigator.seekRequest { jump(to: req, proxy) }
+            }
             .overlay(alignment: .bottom) {
                 if !following && player.isPlaying {
                     Button {
@@ -479,20 +514,30 @@ struct TranscriptView: View {
     @ViewBuilder
     private func segmentRow(_ seg: TranscriptSegment) -> some View {
         let active = seg.contains(player.currentTime)
+        let flash = seg.id == flashID
         HStack(alignment: .firstTextBaseline, spacing: 8) {
             Text(SidebarView.mmss(seg.startTime))
                 .font(Brand.mono(10.5))
-                .foregroundStyle(active ? palette.accentText : palette.muted)
+                .foregroundStyle(active || flash ? palette.accentText : palette.muted)
                 .frame(width: 42, alignment: .trailing)
             Text(seg.text)
                 .font(Brand.body(13))
-                .foregroundStyle(palette.ink.opacity(active ? 1 : 0.82))
-                .fontWeight(active ? .medium : .regular)
+                .foregroundStyle(palette.ink.opacity(active || flash ? 1 : 0.82))
+                .fontWeight(active || flash ? .medium : .regular)
         }
         .id(seg.id)
         .padding(.vertical, 4).padding(.horizontal, 8)
-        .background(active ? palette.accent.opacity(palette.isDark ? 0.22 : 0.30) : .clear,
-                    in: RoundedRectangle(cornerRadius: 7, style: .continuous))
+        .background(
+            (flash ? palette.accent.opacity(palette.isDark ? 0.38 : 0.5)
+                   : active ? palette.accent.opacity(palette.isDark ? 0.22 : 0.30)
+                   : .clear),
+            in: RoundedRectangle(cornerRadius: 7, style: .continuous))
+        .overlay(alignment: .leading) {
+            if flash {
+                RoundedRectangle(cornerRadius: 2).fill(palette.accent)
+                    .frame(width: 3).padding(.vertical, 2)
+            }
+        }
         .contentShape(Rectangle())
         .onTapGesture {
             player.seek(to: seg.startTime)
