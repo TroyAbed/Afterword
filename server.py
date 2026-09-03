@@ -234,7 +234,12 @@ def _worker() -> None:
             if m.get("summary_model"):
                 cfg["summary"]["ollama_model"] = m["summary_model"]
             if m.get("ollama_url"):
-                cfg["summary"]["ollama_url"] = m["ollama_url"]
+                from urllib.parse import urlparse
+                u = urlparse(m["ollama_url"])
+                if u.scheme in ("http", "https") and u.hostname:
+                    cfg["summary"]["ollama_url"] = m["ollama_url"]
+                else:
+                    print(f"[summary] ignoring unusable ollama_url {m['ollama_url']!r}", flush=True)
             if m.get("speaker_count"):
                 cfg["transcribe"]["min_speakers"] = m["speaker_count"]
                 cfg["transcribe"]["max_speakers"] = m["speaker_count"]

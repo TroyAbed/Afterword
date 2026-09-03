@@ -17,6 +17,19 @@ final class Transcriber: ObservableObject {
         return ScribeAPI(baseURL: url, token: settings.token)
     }
 
+    /// The Ollama override, only if it's a usable http(s) URL with a host —
+    /// otherwise "" so the server falls back to its own Ollama. A half-typed
+    /// value here would otherwise fail every summary with a DNS error.
+    private var ollamaOverride: String {
+        let raw = settings.ollamaURL.trimmingCharacters(in: .whitespaces)
+        guard !raw.isEmpty,
+              let u = URL(string: raw),
+              let scheme = u.scheme?.lowercased(), scheme == "http" || scheme == "https",
+              let host = u.host, !host.isEmpty
+        else { return "" }
+        return raw
+    }
+
     /// The vocabulary hint sent with every job: the user's list plus the names
     /// of every saved voice (so recurring people get spelled right).
     private var vocabHint: String {
@@ -92,7 +105,7 @@ final class Transcriber: ObservableObject {
             do {
                 let summary = try await api.resummarize(
                     jobID: jid, speakers: s.speakerNames,
-                    summaryModel: settings.summaryModel, ollamaURL: settings.ollamaURL)
+                    summaryModel: settings.summaryModel, ollamaURL: ollamaOverride)
                 guard var cur = store.session(id) else { return }
                 cur.summaryMarkdown = summary
                 if cur.status == .error {          // summary was the only thing missing
@@ -153,7 +166,7 @@ final class Transcriber: ObservableObject {
             let created = try await api.submit(
                 audio: audio, systemAudio: sysURL, kind: s.kind,
                 title: s.title, language: settings.language,
-                summaryModel: settings.summaryModel, ollamaURL: settings.ollamaURL,
+                summaryModel: settings.summaryModel, ollamaURL: ollamaOverride,
                 speakerCount: s.speakerCount, vocab: vocabHint)
             s.serverJobID = created.id
             s.status = .processing
