@@ -74,6 +74,14 @@ struct SettingsView: View {
                 }
                 Text("Wird für neue Aufnahmen verwendet. Kann im Aufnahmefenster pro Aufnahme geändert werden.")
                     .font(.caption).foregroundStyle(.secondary)
+
+                Picker("Videoqualität", selection: $settings.videoQuality) {
+                    ForEach(VideoQuality.allCases) { Text(LocalizedStringKey($0.label)).tag($0.rawValue) }
+                }
+                Text(LocalizedStringKey((VideoQuality(rawValue: settings.videoQuality) ?? .standard).detail))
+                    .font(.caption).foregroundStyle(.secondary)
+                Text("Standardwert fürs Meeting-Fenster-Video; pro Aufnahme änderbar. Das Video wird immer hart gedeckelt.")
+                    .font(.caption).foregroundStyle(.secondary)
             }
 
             Section("Namen & Begriffe") {

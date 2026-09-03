@@ -27,7 +27,8 @@ final class RecordingController: ObservableObject {
     }
 
     func begin(kind: SessionKind, title: String, wantsSystemAudio: Bool,
-               speakerCount: Int = 0, videoWindow: SCWindow? = nil) async {
+               speakerCount: Int = 0, videoWindow: SCWindow? = nil,
+               videoQuality: VideoQuality = .standard) async {
         notice = nil
         guard await AudioRecorder.requestMicPermission() else {
             notice = "Mikrofonzugriff verweigert – in den Systemeinstellungen erlauben."
@@ -64,7 +65,8 @@ final class RecordingController: ObservableObject {
             let cap = WindowVideoCapture()
             cap.onPreview = { [weak self] img in self?.previewFrame = img }
             do {
-                try await cap.start(window: videoWindow, to: store.videoURL(for: s.id))
+                try await cap.start(window: videoWindow, to: store.videoURL(for: s.id),
+                                    quality: videoQuality)
                 videoCapture = cap
                 recordingVideo = true
             } catch {

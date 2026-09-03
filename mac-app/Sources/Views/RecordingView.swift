@@ -5,6 +5,7 @@ import ScreenCaptureKit
 struct RecordingView: View {
     @EnvironmentObject var controller: RecordingController
     @EnvironmentObject var recorder: AudioRecorder
+    @EnvironmentObject var settings: AppSettings
     @Environment(\.dismiss) private var dismiss
     @Environment(\.palette) private var palette
 
@@ -20,6 +21,7 @@ struct RecordingView: View {
     @State private var chosenWindow: CGWindowID?
     @State private var loadingWindows = false
     @State private var autoDetected = false
+    @State private var videoQuality: VideoQuality = .standard
 
     private var selectedWindow: SCWindow? {
         windows.first { $0.windowID == chosenWindow }
@@ -92,6 +94,12 @@ struct RecordingView: View {
                             .toggleStyle(.checkbox)
                             .onChange(of: recordVideo) { _, on in if on { refreshWindows() } }
                         if recordVideo {
+                            Picker("Qualität", selection: $videoQuality) {
+                                ForEach(VideoQuality.allCases) { Text(LocalizedStringKey($0.label)).tag($0) }
+                            }
+                            .pickerStyle(.segmented)
+                            Text(LocalizedStringKey(videoQuality.detail))
+                                .font(.caption2).foregroundStyle(.tertiary)
                             HStack {
                                 Text("Fenster wählen").font(.caption.weight(.semibold))
                                     .foregroundStyle(.secondary)
@@ -174,7 +182,8 @@ struct RecordingView: View {
                             await controller.begin(
                                 kind: kind, title: title, wantsSystemAudio: wantsSystemAudio,
                                 speakerCount: speakerCount,
-                                videoWindow: (kind == .meeting && recordVideo) ? selectedWindow : nil)
+                                videoWindow: (kind == .meeting && recordVideo) ? selectedWindow : nil,
+                                videoQuality: videoQuality)
                         }
                     }
                 }
@@ -189,6 +198,7 @@ struct RecordingView: View {
         .frame(width: 420)
         .background(palette.paper)
         .task {
+            videoQuality = VideoQuality(rawValue: settings.videoQuality) ?? .standard
             await calendar.requestAccessAndRefresh()
             if let e = calendar.current, title.isEmpty {
                 title = e.title

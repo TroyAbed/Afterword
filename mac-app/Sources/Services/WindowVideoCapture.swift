@@ -11,6 +11,13 @@ final class WindowVideoCapture: NSObject, SCStreamOutput, SCStreamDelegate {
     private var started = false
     private let queue = DispatchQueue(label: "afterword.window-video")
 
+    /// Hard ceiling on the video file. Beyond this the video stops (audio keeps
+    /// going) — a long meeting should never leave a multi-GB file behind.
+    static let maxBytes: Int64 = 4_000_000_000
+    private var outURL: URL?
+    private var videoDone = false
+    private var lastSizeCheck = Date.distantPast
+
     /// live low-fps frames for a recording-time preview
     var onPreview: ((CGImage) -> Void)?
     private let ciContext = CIContext(options: [.cacheIntermediates: false])
@@ -77,12 +84,12 @@ final class WindowVideoCapture: NSObject, SCStreamOutput, SCStreamDelegate {
         return NSImage(cgImage: cg, size: NSSize(width: cfg.width, height: cfg.height))
     }
 
-    func start(window: SCWindow, to url: URL) async throws {
+    func start(window: SCWindow, to url: URL, quality: VideoQuality = .standard) async throws {
         try? FileManager.default.removeItem(at: url)
+        outURL = url
+        videoDone = false
 
-        // storage-friendly: cap at 1280 wide, 12 fps, HEVC, ~1.2 Mbps.
-        // A screen recording of a video call at that is ~500 MB/h and looks fine.
-        let cap: CGFloat = 1280
+        let cap = quality.widthCap
         let scale = window.frame.width > cap ? cap / window.frame.width : 1.0
         let w = max(Int(window.frame.width * scale) & ~1, 2)
         let h = max(Int(window.frame.height * scale) & ~1, 2)
@@ -90,7 +97,7 @@ final class WindowVideoCapture: NSObject, SCStreamOutput, SCStreamDelegate {
         let cfg = SCStreamConfiguration()
         cfg.width = w
         cfg.height = h
-        cfg.minimumFrameInterval = CMTime(value: 1, timescale: 12)
+        cfg.minimumFrameInterval = CMTime(value: 1, timescale: quality.fps)
         cfg.queueDepth = 5
         cfg.showsCursor = false
         cfg.capturesAudio = false
@@ -106,8 +113,8 @@ final class WindowVideoCapture: NSObject, SCStreamOutput, SCStreamDelegate {
             AVVideoWidthKey: w,
             AVVideoHeightKey: h,
             AVVideoCompressionPropertiesKey: [
-                AVVideoAverageBitRateKey: min(Int(Double(w * h) * 1.6), 2_500_000),
-                AVVideoMaxKeyFrameIntervalKey: 48,
+                AVVideoAverageBitRateKey: min(Int(Double(w * h) * 2.0), quality.bitrate),
+                AVVideoMaxKeyFrameIntervalKey: Int(quality.fps) * 4,
             ],
         ])
         vin.expectsMediaDataInRealTime = true
@@ -153,8 +160,20 @@ final class WindowVideoCapture: NSObject, SCStreamOutput, SCStreamDelegate {
             writer.startSession(atSourceTime: CMSampleBufferGetPresentationTimeStamp(sampleBuffer))
             started = true
         }
-        if videoInput.isReadyForMoreMediaData {
+        if !videoDone && videoInput.isReadyForMoreMediaData {
             videoInput.append(sampleBuffer)
+        }
+
+        // stop the video (not the audio) if the file gets out of hand
+        if !videoDone, Date().timeIntervalSince(lastSizeCheck) > 10 {
+            lastSizeCheck = Date()
+            if let outURL,
+               let size = try? FileManager.default.attributesOfItem(atPath: outURL.path)[.size] as? Int64,
+               size > Self.maxBytes {
+                NSLog("WindowVideoCapture: hit \(Self.maxBytes) B cap, stopping video")
+                videoDone = true
+                videoInput.markAsFinished()
+            }
         }
 
         if let onPreview, Date().timeIntervalSince(lastPreview) > 0.33,

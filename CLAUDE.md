@@ -159,8 +159,11 @@ Sources/
                             display filter, writes system.m4a. Falls back to
                             mic-only if Screen Recording isn't granted.
     WindowVideoCapture.swift  `SCContentFilter(desktopIndependentWindow:)`,
-                            AVAssetWriter HEVC (H.264 fallback), 1280px / 12 fps /
-                            ~1.2 Mbps ≈ 500 MB/h. `windows()`, `thumbnail(of:)`,
+                            AVAssetWriter HEVC (H.264 fallback). Quality from a
+                            `VideoQuality` preset (Sparsam/Standard/Bildschirm —
+                            854–1600 px, 5–10 fps, ≤ ~1.1 GB/h). Hard file cap at
+                            `WindowVideoCapture.maxBytes` (4 GB): video stops,
+                            audio continues. `windows()`, `thumbnail(of:)`,
                             `likelyMeetingWindow`/`meetingScore` (bundle id + title
                             heuristics: Zoom "Zoom Meeting" not "Zoom Workplace",
                             Teams Besprechung, Webex, Slack huddle, meet.google /
@@ -185,6 +188,7 @@ Sources/
     SessionExport.swift     protocol / transcript / combined `.md` + `.srt`,
                             NSSavePanel + NSSharingServicePicker.
   Support/
+    VideoQuality.swift      3 meeting-video presets (see WindowVideoCapture).
     AppSettings.swift       UserDefaults-backed. serverURL, token, language
                             (spoken), summaryModel, autoRecordMode, colorway,
                             appearance, uiLanguage. `uiLocale` → nil = follow system.

@@ -14,6 +14,8 @@ final class AppSettings: ObservableObject {
     @Published var vocabulary: String    { didSet { d.set(vocabulary, forKey: "vocabulary") } }
     /// Preferred input device uniqueID. "" = system default.
     @Published var micDeviceID: String   { didSet { d.set(micDeviceID, forKey: "micDeviceID") } }
+    /// Default meeting-window video quality; VideoQuality.rawValue.
+    @Published var videoQuality: String  { didSet { d.set(videoQuality, forKey: "videoQuality") } }
     /// "off" | "ask" | "auto" — what to do when a calendar meeting starts
     @Published var autoRecordMode: String { didSet { d.set(autoRecordMode, forKey: "autoRecordMode") } }
     /// Colorway.rawValue — swaps the palette, never the layout
@@ -33,6 +35,7 @@ final class AppSettings: ObservableObject {
         ollamaURL = d.string(forKey: "ollamaURL") ?? ""
         vocabulary = d.string(forKey: "vocabulary") ?? ""
         micDeviceID = d.string(forKey: "micDeviceID") ?? ""
+        videoQuality = d.string(forKey: "videoQuality") ?? VideoQuality.standard.rawValue
         autoRecordMode = d.string(forKey: "autoRecordMode") ?? "ask"
         colorway = d.string(forKey: "colorway") ?? Colorway.schwefel.rawValue
         appearance = d.string(forKey: "appearance") ?? Appearance.system.rawValue

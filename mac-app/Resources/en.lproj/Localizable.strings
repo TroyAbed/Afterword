@@ -133,3 +133,11 @@
 "Neu transkribieren" = "Transcribe again";
 "nicht verbunden" = "not connected";
 "Nimm ein Meeting oder eine Voice Note auf — oder importiere eine Datei." = "Record a meeting or a voice note — or import a file.";
+"Qualität" = "Quality";
+"Sparsam" = "Frugal";
+"Bildschirm" = "Screen";
+"854 px · 5 fps · ~200 MB/h — reicht für Gesichter" = "854 px · 5 fps · ~200 MB/h — fine for faces";
+"1280 px · 10 fps · ~550 MB/h" = "1280 px · 10 fps · ~550 MB/h";
+"1600 px · 10 fps · ~1,1 GB/h — Text bleibt scharf" = "1600 px · 10 fps · ~1.1 GB/h — text stays sharp";
+"Videoqualität" = "Video quality";
+"Standardwert fürs Meeting-Fenster-Video; pro Aufnahme änderbar. Das Video wird immer hart gedeckelt." = "Default for the meeting-window video; adjustable per recording. The video is always hard-capped.";

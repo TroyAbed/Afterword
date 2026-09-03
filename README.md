@@ -137,7 +137,8 @@ xcodegen generate && open Afterword.xcodeproj   # Schema „Afterword" → ⌘R
 ```
 
 Nimmt Mikro + (bei Meetings) Systemton über ScreenCaptureKit auf + optional das
-Meeting-Fenster als Video (bleibt lokal, wird nie hochgeladen). Lädt zum Dienst
+Meeting-Fenster als Video (bleibt lokal, wird nie hochgeladen; Qualität in drei
+Stufen, immer hart gedeckelt). Lädt zum Dienst
 hoch, pollt, zeigt erst Transkript, dann Protokoll. **Dateien importieren** (Audio oder Video) statt aufzunehmen. **Mikrofon wählbar**
 (Einstellungen + pro Aufnahme). **Sprecherzahl vorgeben** wenn die automatische
 Erkennung daneben liegt. **Namen & Begriffe** für bessere Schreibweisen im
