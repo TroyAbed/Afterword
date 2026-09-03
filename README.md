@@ -208,4 +208,5 @@ Danach normal öffnen. Server-URL in **Einstellungen → Server** setzen.
 
 - `CLAUDE.md` — ausführliche Architektur- und Zustandsdoku (auch für eine neue Claude-Session).
 - `mac-app/README.md` — Detailaufbau der macOS-App.
-- `linux-app/README.md` — der Linux-Client (CachyOS/Arch: `makepkg -si`).
+- `linux-app/README.md` — der Linux-Client, mit Build-Anleitung (CachyOS/Arch:
+  `cd linux-app && makepkg -si`, sonst `./run.sh`).
