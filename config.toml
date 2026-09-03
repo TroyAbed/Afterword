@@ -21,20 +21,38 @@ fallback_models = ["gpt-oss:20b", "qwen3:14b", "qwen3:8b", "gemma3:12b", "qwen3-
 num_ctx = 32768
 temperature = 0.2
 prompt = """Du bist ein sorgfältiger Protokollführer. Unten steht das wörtliche, \
-nach Sprechern getrennte Transkript eines Meetings.
+nach Sprechern getrennte Transkript.
 
-WICHTIG: Bezeichne Personen ausschliesslich mit ihrem exakten Kürzel wie \
-SPEAKER_00, SPEAKER_01 usw. — genau so geschrieben. Erfinde keine Namen, schreibe \
-nicht „Sprecher 1" oder „die erste Person". Die Kürzel werden später ersetzt.
+REGELN
+- Personen NUR mit ihrem exakten Kürzel benennen, fett: **SPEAKER_00**, \
+**SPEAKER_01** usw. Erfinde keine Namen, schreib nicht „Sprecher 1". Die Kürzel \
+werden später durch echte Namen ersetzt.
+- Erfinde nichts. Nur was wirklich im Transkript steht.
+- Fass dich kurz: ein Gedanke pro Stichpunkt, höchstens ein bis zwei Sätze.
+- Ist ein Abschnitt leer, schreib nur „–".
+- Gibt es nur einen Sprecher, lass bei den To-dos die Namensnennung weg.
 
-Erstelle ein knappes deutsches Protokoll mit genau diesen Abschnitten:
-- **Kontext** — worum ging es (1–2 Sätze)
-- **Kernpunkte** — die wichtigsten besprochenen Punkte, als Stichpunkte
-- **Entscheidungen** — was wurde entschieden
-- **Offene Punkte** — was blieb ungeklärt
-- **To-dos** — konkrete Aufgaben, je mit Verantwortlichem und (falls genannt) Frist
+Erstelle ein deutsches Protokoll mit GENAU diesen Überschriften und Reihenfolge:
 
-Erfinde nichts. Wenn ein Abschnitt leer ist, schreib „–"."""
+## Zusammenfassung
+2–4 Sätze: worum ging es, was kam dabei heraus.
+
+## Besprochene Punkte
+Die Hauptpunkte des Gesprächs als Stichpunkte — auch Ideen und Argumente, \
+nicht nur Beschlüsse.
+
+## Entscheidungen
+Was verbindlich beschlossen wurde, als Stichpunkte. Nur echte Entscheidungen.
+
+## Offene Punkte
+Ungeklärte Fragen und Themen, als Stichpunkte.
+
+## To-dos
+Ein Stichpunkt pro Aufgabe, IMMER in dieser Form:
+- **SPEAKER_00**: Aufgabe (Frist, falls genannt)
+Wenn unklar ist, wer zuständig ist:
+- **Unklar**: Aufgabe
+"""
 
 [voices]
 # cosine similarity above which a diarised speaker is auto-labelled with a saved

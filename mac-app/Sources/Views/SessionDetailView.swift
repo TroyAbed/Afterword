@@ -686,20 +686,30 @@ struct MarkdownText: View {
             ForEach(Array(text.split(separator: "\n", omittingEmptySubsequences: false).enumerated()),
                     id: \.offset) { _, raw in
                 let line = String(raw)
-                if line.hasPrefix("# ") {
-                    Text(line.dropFirst(2))
-                        .caps(11).foregroundStyle(palette.muted)
+                if line.hasPrefix("### ") {
+                    Text(line.dropFirst(4))
+                        .font(Brand.label(12, .semibold))
+                        .foregroundStyle(palette.ink)
                         .padding(.top, 8)
                 } else if line.hasPrefix("## ") {
                     Text(line.dropFirst(3))
-                        .caps(10.5).foregroundStyle(palette.muted)
-                        .padding(.top, 6)
-                } else if line.hasPrefix("- ") || line.hasPrefix("* ") {
+                        .font(Brand.display(13)).textCase(.uppercase).tracking(0.5)
+                        .foregroundStyle(palette.ink)
+                        .padding(.top, 14).padding(.bottom, 1)
+                } else if line.hasPrefix("# ") {
+                    Text(line.dropFirst(2))
+                        .font(Brand.display(15)).textCase(.uppercase).tracking(0.4)
+                        .foregroundStyle(palette.ink)
+                        .padding(.top, 10)
+                } else if line.hasPrefix("- ") || line.hasPrefix("* ")
+                            || line.hasPrefix("  - ") || line.hasPrefix("  * ") {
+                    let body = line.drop(while: { $0 == " " }).dropFirst(2)
                     HStack(alignment: .top, spacing: 9) {
                         Circle().fill(palette.accentText)
                             .frame(width: 5, height: 5).padding(.top, 7)
-                        inline(String(line.dropFirst(2)))
+                        inline(String(body))
                     }
+                    .padding(.leading, line.hasPrefix("  ") ? 16 : 0)
                 } else if line.trimmingCharacters(in: .whitespaces).isEmpty {
                     Spacer().frame(height: 2)
                 } else {

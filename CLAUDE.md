@@ -80,9 +80,13 @@ config.toml` + the plist into `~/whisper-service/app/`, then boots the service.
   `language` (`de`), `initial_prompt` (CH vocab bias — Alp, Sennerei, kWp,
   Dachpacht…), optional `min_speakers` / `max_speakers`.
 - `[summary]` — `ollama_url`, `ollama_model`, `fallback_models` (ordered list),
-  `num_ctx`, `temperature`, and **`prompt`** (the long German instruction —
-  tells the model to write speaker refs verbatim as `SPEAKER_00` so the client
-  can substitute names locally). **`[voices]` must stay at the end of the file**
+  `num_ctx`, `temperature`, and **`prompt`**. The prompt fixes the report shape:
+  `## Zusammenfassung / Besprochene Punkte / Entscheidungen / Offene Punkte /
+  To-dos`, To-dos as `- **SPEAKER_00**: task (Frist)` (name first), one-speaker
+  sessions drop the name. Speaker refs stay verbatim `**SPEAKER_00**` so the
+  client substitutes real names locally. `MarkdownText` renders `##` as an
+  uppercase section head. No per-job/per-app prompt override yet — would be a
+  `prompt` form field like `summary_model`. **`[voices]` must stay at the end of the file**
   — a TOML section after `[summary]` once swallowed `[summary].prompt`.
 - `[voices]` — `match_threshold` (0.62; needs tuning once real voices are enrolled).
 
