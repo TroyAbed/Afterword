@@ -26,6 +26,7 @@ xcodegen generate >/dev/null
 xcodebuild -project Afterword.xcodeproj -scheme Afterword -configuration Release \
   -derivedDataPath "$DERIVED" \
   MARKETING_VERSION="$VER" CURRENT_PROJECT_VERSION="$(date +%Y%m%d)" \
+  ARCHS="arm64 x86_64" ONLY_ACTIVE_ARCH=NO \
   build >/dev/null
 APP="$DERIVED/Build/Products/Release/Afterword.app"
 [ -d "$APP" ] || { echo "build produced no .app"; exit 1; }

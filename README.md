@@ -179,7 +179,8 @@ Die App wird nicht ins Repo eingecheckt — sie hängt als `.dmg` an einem
 ./release.sh 0.2 --dmg-only # nur die .dmg nach dist/, kein Release
 ```
 
-Von Hand geht es auch: `dist/Afterword-<ver>.dmg` bauen (`./release.sh <ver> --dmg-only`),
+`release.sh` baut **universal** (arm64 + x86_64) — die Build-Maschine ist Intel,
+die Zielgeräte meist nicht. Von Hand geht es auch: `dist/Afterword-<ver>.dmg` bauen (`./release.sh <ver> --dmg-only`),
 dann auf github.com → **Releases → Draft a new release**, Tag `v<ver>`, die `.dmg`
 in „Attach binaries" ziehen, **Publish**.
 

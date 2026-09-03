@@ -114,7 +114,7 @@ struct SessionDetailView: View {
     private var videoPane: some View {
         VStack(spacing: 0) {
             ZStack(alignment: .topTrailing) {
-                VideoPlayer(player: player.player)
+                PlayerView(player: player.player)
                     .frame(height: max(120, videoHeight))
                     .background(.black)
                     .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
@@ -172,7 +172,7 @@ struct SessionDetailView: View {
     private var fullscreenVideo: some View {
         ZStack(alignment: .topTrailing) {
             Color.black.ignoresSafeArea()
-            VideoPlayer(player: player.player).ignoresSafeArea()
+            PlayerView(player: player.player).ignoresSafeArea()
             Button { videoFullscreen = false } label: {
                 Image(systemName: "xmark.circle.fill").font(.title)
                     .foregroundStyle(.white.opacity(0.85))
@@ -692,5 +692,26 @@ struct Scrubber: View {
 
     private func fraction(_ t: TimeInterval, _ total: TimeInterval) -> Double {
         min(max(t / total, 0), 1)
+    }
+}
+
+/// AppKit `AVPlayerView` wrapped for SwiftUI. Deliberately not SwiftUI's
+/// `VideoPlayer`: that lives in `_AVKit_SwiftUI`, whose x86_64 slice fatal-errors
+/// in generic-metadata setup when the app runs translated (Rosetta) on macOS 26.
+/// `AVPlayerView` (plain AVKit) has no such problem.
+struct PlayerView: NSViewRepresentable {
+    let player: AVPlayer
+
+    func makeNSView(context: Context) -> AVPlayerView {
+        let v = AVPlayerView()
+        v.player = player
+        v.controlsStyle = .inline
+        v.videoGravity = .resizeAspect
+        v.showsFullScreenToggleButton = false
+        return v
+    }
+
+    func updateNSView(_ v: AVPlayerView, context: Context) {
+        if v.player !== player { v.player = player }
     }
 }

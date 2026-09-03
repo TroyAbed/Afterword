@@ -279,6 +279,14 @@ live, no restart.
 
 ## 5. Known issues / open work
 
+- **`VideoPlayer` crashed under Rosetta** (fixed 2026-09-03). The Mac Pro is
+  Intel, so `xcodebuild` produced an x86_64-only app; on an Apple-Silicon Mac it
+  ran translated, and SwiftUI's `VideoPlayer` (`_AVKit_SwiftUI`) fatal-errors in
+  generic-metadata setup under Rosetta on macOS 26. Two fixes applied: (a)
+  `release.sh` now builds universal (`ARCHS="arm64 x86_64"`), (b) `VideoPlayer`
+  replaced with `PlayerView`, an `NSViewRepresentable` around AppKit's
+  `AVPlayerView` — no `_AVKit_SwiftUI` dependency at all. **Always build the
+  release universal** — the build machine is Intel, most targets are not.
 - **Code signing.** The Xcode account is in a bad state ("No Account for Team
   848Y9PHXTS"). `project.yml` is plain `CODE_SIGN_STYLE: Automatic`, no team.
   **Consequence: the Screen Recording grant resets on every rebuild** — the user
