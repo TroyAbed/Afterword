@@ -203,5 +203,7 @@ Danach normal öffnen. Server-URL in **Einstellungen → Server** setzen.
 
 ## Weiteres
 
+- `CHANGELOG.md` — Änderungen je Version (auch die Release-Notes).
+
 - `CLAUDE.md` — ausführliche Architektur- und Zustandsdoku (auch für eine neue Claude-Session).
 - `mac-app/README.md` — Detailaufbau der App.

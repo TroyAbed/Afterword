@@ -53,15 +53,23 @@ gh auth status >/dev/null 2>&1 || { echo "not logged in — run 'gh auth login'"
 echo "── publish GitHub release $TAG ──"
 git tag -f "$TAG"
 git push origin "$TAG"
-NOTES="$(cat <<EOF
-macOS 14+, Apple Silicon or Intel. Ad-hoc signed — after downloading:
-
-    xattr -dr com.apple.quarantine /Applications/Afterword.app
-
+INSTALL="macOS 14+, Apple Silicon or Intel. Ad-hoc signed — after downloading:
+\`\`\`
+xattr -dr com.apple.quarantine /Applications/Afterword.app
+\`\`\`
 Then open normally. First launch asks for Microphone (+ Screen Recording for
 system audio / video; restart after granting). Set the server URL in
-Einstellungen → Server.
-EOF
-)"
-gh release create "$TAG" "$DMG" --title "Afterword $VER" --notes "$NOTES"
+Einstellungen \u2192 Server."
+
+# release notes: the CHANGELOG section for this version, else just the install note
+NOTES_FILE="$(mktemp)"
+if [ -f "$ROOT/CHANGELOG.md" ] && awk -v v="## $VER" '$0==v{f=1;next} /^## /{f=0} f' "$ROOT/CHANGELOG.md" | grep -q .; then
+  awk -v v="## $VER" '$0==v{f=1;next} /^## /{f=0} f' "$ROOT/CHANGELOG.md" > "$NOTES_FILE"
+  printf '\n---\n\n%b\n' "$INSTALL" >> "$NOTES_FILE"
+else
+  printf '%b\n' "$INSTALL" > "$NOTES_FILE"
+fi
+
+gh release create "$TAG" "$DMG" --title "Afterword $VER" --notes-file "$NOTES_FILE"
+rm -f "$NOTES_FILE"gh release create "$TAG" "$DMG" --title "Afterword $VER" --notes "$NOTES"
 echo "── done ──"
