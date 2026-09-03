@@ -68,8 +68,16 @@ def transcribe_segments(audio: Path, cfg: dict) -> tuple[list[dict], str]:
         word_timestamps=True,
         condition_on_previous_text=False,
     )
-    segs = [{"start": s["start"], "end": s["end"], "text": s["text"].strip()}
-            for s in r.get("segments", []) if s.get("text", "").strip()]
+    segs = []
+    for s in r.get("segments", []):
+        if not s.get("text", "").strip():
+            continue
+        segs.append({
+            "start": s["start"], "end": s["end"], "text": s["text"].strip(),
+            "words": [{"start": w.get("start"), "end": w.get("end"),
+                       "word": (w.get("word") or "").strip()}
+                      for w in s.get("words", []) if (w.get("word") or "").strip()],
+        })
     return segs, r.get("language", t.get("language") or "")
 
 
@@ -130,15 +138,54 @@ def diarize(wav: Path, cfg: dict) -> tuple[list[tuple[float, float, str]], dict[
     return turns, embeddings
 
 
-def assign_speakers(segments: list[dict], turns: list[tuple[float, float, str]]) -> None:
-    """Label each segment with the speaker it overlaps most."""
+def _speaker_at(t0: float, t1: float, turns: list[tuple[float, float, str]]) -> str | None:
+    best, best_ov = None, 0.0
+    for ts, te, label in turns:
+        ov = min(t1, te) - max(t0, ts)
+        if ov > best_ov:
+            best_ov, best = ov, label
+    return best
+
+
+def assign_speakers(segments: list[dict], turns: list[tuple[float, float, str]]) -> list[dict]:
+    """Assign a speaker per WORD (not per whole segment), then split each segment
+    at speaker changes. Much better at turn boundaries than whole-segment
+    max-overlap. Returns a new segment list; segments with no word timestamps
+    fall back to the old behaviour."""
+    if not turns:
+        for seg in segments:
+            seg["speaker"] = None
+        return segments
+
+    out: list[dict] = []
     for seg in segments:
-        best, best_ov = None, 0.0
-        for ts, te, label in turns:
-            ov = min(seg["end"], te) - max(seg["start"], ts)
-            if ov > best_ov:
-                best_ov, best = ov, label
-        seg["speaker"] = best
+        words = seg.get("words") or []
+        if not words:
+            seg["speaker"] = _speaker_at(seg["start"], seg["end"], turns)
+            seg.pop("words", None)
+            out.append(seg)
+            continue
+
+        labels = [_speaker_at(w["start"], w["end"], turns)
+                  if w.get("start") is not None and w.get("end") is not None
+                  else None for w in words]
+        # smooth single-word flips:  A B A  ->  A A A
+        for i in range(1, len(labels) - 1):
+            if labels[i] != labels[i - 1] and labels[i - 1] == labels[i + 1]:
+                labels[i] = labels[i - 1]
+
+        run_start = 0
+        for i in range(1, len(words) + 1):
+            if i == len(words) or labels[i] != labels[run_start]:
+                run = words[run_start:i]
+                out.append({
+                    "start": run[0]["start"] if run[0]["start"] is not None else seg["start"],
+                    "end": run[-1]["end"] if run[-1]["end"] is not None else seg["end"],
+                    "text": " ".join(w["word"] for w in run).strip(),
+                    "speaker": labels[run_start] or _speaker_at(seg["start"], seg["end"], turns),
+                })
+                run_start = i
+    return out
 
 
 # ---- assembly --------------------------------------------------------------
@@ -191,7 +238,7 @@ def summarize(transcript_md: str, cfg: dict) -> str:
         "messages": [{"role": "user", "content": s["prompt"] + "\n\n---\n\n" + transcript_md}],
         "stream": False,
         "keep_alive": s.get("keep_alive", "30m"),
-        "options": {"temperature": s.get("temperature", 0.2),
+        "options": {"temperature": s.get("temperature", 0.0),
                     "num_ctx": s.get("num_ctx", 32768)},
     }
     req = urllib.request.Request(
@@ -211,7 +258,7 @@ def transcribe_and_diarize(audio: Path, workdir: Path, cfg: dict, *,
 
     segments, language = transcribe_segments(wav, cfg)
     turns, embeddings = diarize(wav, cfg)
-    assign_speakers(segments, turns)
+    segments = assign_speakers(segments, turns)
 
     return {
         "transcript_md": format_markdown(segments, names),

@@ -17,9 +17,9 @@ initial_prompt = "Gespräch auf Deutsch mit Schweizer Bezug: Alp, Älpler, Senne
 ollama_url = "http://localhost:11434"   # default; the app can override this per job
 ollama_model = "gpt-oss:20b"            # best for this; re-pull if removed
 # used in order if ollama_model isn't on the Studio (models get cleaned up there)
-fallback_models = ["gpt-oss:20b", "qwen3:14b", "qwen3:8b", "gemma3:12b", "qwen3-coder:30b", "qwen3.8:27b-mlx"]
+fallback_models = ["gpt-oss:20b", "qwen3:14b", "qwen3:8b", "gemma3:12b", "qwen2.5:14b", "mistral-small", "qwen3-coder:30b", "qwen3.8:27b-mlx"]
 num_ctx = 32768
-temperature = 0.2
+temperature = 0.0            # faithful, not creative
 prompt = """Du bist ein sorgfältiger Protokollführer. Unten steht das wörtliche, \
 nach Sprechern getrennte Transkript.
 
@@ -27,7 +27,12 @@ REGELN
 - Personen NUR mit ihrem exakten Kürzel benennen, fett: **SPEAKER_00**, \
 **SPEAKER_01** usw. Erfinde keine Namen, schreib nicht „Sprecher 1". Die Kürzel \
 werden später durch echte Namen ersetzt.
-- Erfinde nichts. Nur was wirklich im Transkript steht.
+- Erfinde NICHTS. Nur was wörtlich oder eindeutig im Transkript steht. Keine \
+Annahmen über Absichten, keine Schlussfolgerungen, kein „gemeint war vermutlich".
+- Ist etwas unklar, abgebrochen oder nur angedeutet, schreib genau das hin \
+(„unklar", „nicht zu Ende besprochen") — ergänze es nicht.
+- Das Transkript kann Hörfehler enthalten. Bei einem offensichtlich falsch \
+verstandenen Wort: sinngemäss wiedergeben, aber nichts dazuerfinden.
 - Fass dich kurz: ein Gedanke pro Stichpunkt, höchstens ein bis zwei Sätze.
 - Ist ein Abschnitt leer, schreib nur „–".
 - Gibt es nur einen Sprecher, lass bei den To-dos die Namensnennung weg.

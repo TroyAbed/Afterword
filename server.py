@@ -243,6 +243,10 @@ def _worker() -> None:
             if m.get("speaker_count"):
                 cfg["transcribe"]["min_speakers"] = m["speaker_count"]
                 cfg["transcribe"]["max_speakers"] = m["speaker_count"]
+            elif m.get("kind") == "meeting":
+                # a meeting has at least two people; stops pyannote collapsing
+                # two similar voices on one mic into one speaker
+                cfg["transcribe"].setdefault("min_speakers", 2)
             if m.get("vocab"):
                 base = cfg["transcribe"].get("initial_prompt", "")
                 cfg["transcribe"]["initial_prompt"] = (

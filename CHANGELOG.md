@@ -2,6 +2,13 @@
 
 ## Unveröffentlicht
 
+- Sprecher-Zuordnung pro Wort statt pro Whisper-Segment — trennt Wortwechsel
+  mitten im Satz sauber, statt den ganzen Satz einer Person zuzuschlagen.
+- Meetings gehen jetzt von mindestens zwei Sprechern aus.
+- Protokoll: `temperature = 0` und der Prompt ist strenger gegen Erfinden —
+  Unklares wird als unklar benannt statt ergänzt. **Das Modell auf dem Studio
+  ist der grösste Hebel:** `gpt-oss:20b` neu ziehen oder `qwen3:14b`, ein
+  Code-Modell taugt für Fliesstext-Protokolle wenig.
 - Ein halb eingetippter „Ollama-Server"-Wert wird ignoriert statt jede
   Zusammenfassung mit einem DNS-Fehler abzubrechen.
 

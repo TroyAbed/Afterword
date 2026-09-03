@@ -321,8 +321,10 @@ live, no restart.
   and gives you the real id for `project.yml`.
 - **Bundle-id change did reset all TCC grants** (mic, screen recording, calendar)
   — expected, one-time, after the MeetingScribe→Afterword rename.
-- **Diarisation of two people on one mic** (no system audio, same room) can
-  collapse to one speaker. Mitigation: the user sets "Sprecher: N" before
+- **Diarisation of two people on one mic** (no system audio, same room, short
+  clip) can still collapse to one speaker even with per-word assignment. Meetings
+  now default to `min_speakers=2`. Best mitigation: the user sets "Sprecher: N"
+  before
   recording / on import, or on a finished session via "Falsche Sprecherzahl?" →
   re-transcribe. There is no post-hoc split without re-running the pipeline.
 - **Multi-speaker voice matching** — `match_threshold` (0.62) is a guess. Needs
