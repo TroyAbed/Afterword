@@ -8,6 +8,8 @@ enum SessionExport {
         var out = "# \(s.displayTitle)\n\n"
         out += "\(s.kind.label) · \(Session.dateFormatter.string(from: s.createdAt))"
         if let d = s.duration { out += " · \(mmss(d))" }
+        let named = s.speakers.map { s.speakerLabel(for: $0) }.filter { !$0.hasPrefix("SPEAKER_") }
+        if !named.isEmpty { out += " · \(named.joined(separator: ", "))" }
         out += "\n\n"
         out += s.renderedSummary.isEmpty ? "_(kein Protokoll)_\n" : s.renderedSummary + "\n"
         return out
@@ -37,12 +39,14 @@ enum SessionExport {
     }
 
     /// SubRip subtitles, so the transcript can ride along with the video.
+    /// The first cue carries the session title + date.
     static func srt(_ s: Session) -> String {
-        var out = ""
+        var out = "1\n\(srtTime(0)) --> \(srtTime(2.5))\n"
+        out += "\(s.displayTitle)\n\(Session.dateFormatter.string(from: s.createdAt))\n\n"
         for (i, seg) in s.segments.enumerated() {
             let start = seg.start ?? 0
             let end = seg.end ?? (start + 3)
-            out += "\(i + 1)\n\(srtTime(start)) --> \(srtTime(end))\n"
+            out += "\(i + 2)\n\(srtTime(start)) --> \(srtTime(end))\n"
             out += "\(s.speakerLabel(for: seg.speaker)): \(seg.text)\n\n"
         }
         return out
