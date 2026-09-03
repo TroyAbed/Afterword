@@ -38,7 +38,6 @@ BANT-Vorlagen.
 | `com.afterword.server.plist` | LaunchAgent, damit der Dienst auf dem Studio automatisch startet. |
 | `pi/ollama_proxy.py` | TCP-Proxy auf einem Raspberry Pi (`maxpi`), damit Tailscale-Geräte den Studio unter einer festen Adresse erreichen (Ports 11434 Ollama + 8756 Afterword). |
 | `mac-app/` | Die macOS-App (SwiftUI, macOS 14+). Siehe `mac-app/README.md`. |
-| `linux-app/` | Der Linux-Client (PySide6/Qt). Siehe `linux-app/README.md`. |
 | `design/` | Der Design-Canvas (Claude Design): Hauptfenster, Einstellungen, Farbwege, Aufnahme-Sheet. |
 
 ## Der Server (Mac Studio)
@@ -207,6 +206,4 @@ Danach normal öffnen. Server-URL in **Einstellungen → Server** setzen.
 - `CHANGELOG.md` — Änderungen je Version (auch die Release-Notes).
 
 - `CLAUDE.md` — ausführliche Architektur- und Zustandsdoku (auch für eine neue Claude-Session).
-- `mac-app/README.md` — Detailaufbau der macOS-App.
-- `linux-app/README.md` — der Linux-Client, mit Build-Anleitung (CachyOS/Arch:
-  `cd linux-app && makepkg -si`, sonst `./run.sh`).
+- `mac-app/README.md` — Detailaufbau der App.
