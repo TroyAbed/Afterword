@@ -138,9 +138,12 @@ xcodegen generate && open Afterword.xcodeproj   # Schema „Afterword" → ⌘R
 
 Nimmt Mikro + (bei Meetings) Systemton über ScreenCaptureKit auf + optional das
 Meeting-Fenster als Video (bleibt lokal, wird nie hochgeladen). Lädt zum Dienst
-hoch, pollt, zeigt erst Transkript, dann Protokoll. Bibliothek mit Volltextsuche
-über alle Transkripte, Marker (⌘M während der Aufnahme), sprecherübergreifende
-Stimmenerkennung, kalendergesteuerte Auto-Aufnahme, Markdown-/SRT-Export.
+hoch, pollt, zeigt erst Transkript, dann Protokoll. **Dateien importieren** (Audio oder Video) statt aufzunehmen. **Mikrofon wählbar**
+(Einstellungen + pro Aufnahme). **Sprecherzahl vorgeben** wenn die automatische
+Erkennung daneben liegt. **Namen & Begriffe** für bessere Schreibweisen im
+Transkript. Bibliothek mit Volltextsuche über alle Transkripte, Marker (⌘M),
+sprecherübergreifende Stimmenerkennung, kalendergesteuerte Auto-Aufnahme,
+Markdown-/SRT-Export.
 
 Sechs Farbwege (Schwefel ist Standard), hell/dunkel/System, deutsche oder
 englische Oberfläche — alles in **Einstellungen** (⌘, oder das Zahnrad unten in

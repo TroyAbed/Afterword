@@ -3,6 +3,7 @@ import SwiftUI
 struct SettingsView: View {
     @EnvironmentObject var settings: AppSettings
     @EnvironmentObject var transcriber: Transcriber
+    @EnvironmentObject var mics: MicDevices
     @State private var checking = false
     @State private var reachable: Bool?
 
@@ -59,6 +60,28 @@ struct SettingsView: View {
                             .foregroundStyle(r ? .green : .red)
                     }
                 }
+            }
+
+            Section("Aufnahme") {
+                Picker("Mikrofon", selection: $settings.micDeviceID) {
+                    Text("Standard").tag("")
+                    if !mics.devices.isEmpty { Divider() }
+                    ForEach(mics.devices) { Text($0.name).tag($0.id) }
+                    if !settings.micDeviceID.isEmpty
+                        && !mics.devices.contains(where: { $0.id == settings.micDeviceID }) {
+                        Text(mics.name(for: settings.micDeviceID)).tag(settings.micDeviceID)
+                    }
+                }
+                Text("Wird für neue Aufnahmen verwendet. Kann im Aufnahmefenster pro Aufnahme geändert werden.")
+                    .font(.caption).foregroundStyle(.secondary)
+            }
+
+            Section("Namen & Begriffe") {
+                TextField("z.B. Yael, Noa, Ollama, Tailscale", text: $settings.vocabulary,
+                          axis: .vertical)
+                    .lineLimit(2...5)
+                Text("Hilft dem Transkript, Namen und Fachbegriffe richtig zu schreiben. Gespeicherte Stimmen werden automatisch ergänzt.")
+                    .font(.caption).foregroundStyle(.secondary)
             }
 
             Section("Sprache") {
@@ -141,7 +164,7 @@ struct SettingsView: View {
         .background(palette.paper)
         .frame(width: 460)
         .padding()
-        .task { loadModels(); transcriber.loadVoices() }
+        .task { loadModels(); transcriber.loadVoices(); mics.refresh() }
     }
 
     private func check() {

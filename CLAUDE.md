@@ -93,6 +93,11 @@ config.toml` + the plist into `~/whisper-service/app/`, then boots the service.
 → `summarize` → status `done`. Errors store `error` + `traceback` in `meta.json`.
 On boot, `queued`/`running` jobs are re-queued.
 
+`POST /jobs` also accepts `speaker_count` (0 = auto; N forces
+`min_speakers=max_speakers=N` in `cfg["transcribe"]`) and `vocab` (a name/term
+list appended to `initial_prompt` — the app builds it from the user's
+"Namen & Begriffe" setting **plus every saved voice name**).
+
 `POST /jobs` / `/jobs/{id}/resummarize` accept an optional `ollama_url` form
 field (and `/models` an `?ollama_url=` query) — the app exposes it as
 **Einstellungen → Protokoll-Modell → Ollama-Server** so a user can point the
@@ -105,7 +110,8 @@ as a manual escape hatch (after transcript edits, or a failed summary).
 
 ## 4. The app (`mac-app/`)
 
-SwiftUI, macOS 14+, sandboxed. Bundle id `com.troyabed.Afterword`. XcodeGen:
+SwiftUI, macOS 14+, sandboxed, **universal binary** (build machine is Intel —
+always `ARCHS="arm64 x86_64"`, `release.sh` does it). Bundle id `com.troyabed.Afterword`. XcodeGen:
 `project.yml` → `xcodegen generate` → `Afterword.xcodeproj` (**git-ignored,
 regenerate after pulling**). Dev language `de`, localized `de` + `en`.
 
@@ -142,8 +148,13 @@ Sources/
                             4xx fails immediately. `running: Set<UUID>` guard.
                             `resumePending()` = sweep + a 60 s Timer so anything
                             busy is picked up when the Studio wakes.
-    AudioRecorder.swift     Mic via AVAudioRecorder + (meetings) SystemAudioCapture
-                            in parallel, each its own m4a.
+    AudioRecorder.swift     Mic via **AVCaptureSession + AVCaptureAudioFileOutput**
+                            (was AVAudioRecorder — switched so a specific input
+                            device can be chosen; level from the file output's
+                            AVCaptureAudioChannel.averagePowerLevel). + (meetings)
+                            SystemAudioCapture in parallel, each its own m4a.
+    MicDevices.swift        Enumerates input devices for the mic pickers
+                            (AVCaptureDevice.DiscoverySession). Env object.
     SystemAudioCapture.swift  ScreenCaptureKit `SCStream`, `capturesAudio=true`,
                             display filter, writes system.m4a. Falls back to
                             mic-only if Screen Recording isn't granted.
@@ -204,7 +215,13 @@ Sources/
                             (Discord-style thumbnail tiles), auto-detect badge,
                             live preview, ⌘M marker.
     RecordingController.swift  Shared begin/finish/cancel for sheet + menu bar.
-                            markers, previewFrame, recordingVideo.
+                            markers, previewFrame, recordingVideo. `importFile()`
+                            brings an existing audio/video file in (video kept as
+                            the session's video track too). `settings` set by the
+                            app so begin() reads micDeviceID + speakerCount.
+    ImportView.swift        NSOpenPanel + kind/title/speaker-count sheet.
+    RecordingOptions.swift  MicPicker + SpeakerCountPicker, shared across the
+                            recording sheet, menu bar and import sheet.
     MenuBarView.swift       Quick capture + pending-meeting banner + recent list.
     SessionDetailView.swift  Video pane (fullscreen, drag-resize, size + delete),
                             marker chips, PlaybackBar + `Scrubber` (system shape +
@@ -296,6 +313,10 @@ live, no restart.
   and gives you the real id for `project.yml`.
 - **Bundle-id change did reset all TCC grants** (mic, screen recording, calendar)
   — expected, one-time, after the MeetingScribe→Afterword rename.
+- **Diarisation of two people on one mic** (no system audio, same room) can
+  collapse to one speaker. Mitigation: the user sets "Sprecher: N" before
+  recording / on import, or on a finished session via "Falsche Sprecherzahl?" →
+  re-transcribe. There is no post-hoc split without re-running the pipeline.
 - **Multi-speaker voice matching** — `match_threshold` (0.62) is a guess. Needs
   tuning after the user enrols a few real voices. Multi-speaker diarization
   itself is confirmed working (a real 2-person call separated correctly).

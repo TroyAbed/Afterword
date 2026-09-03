@@ -1,9 +1,11 @@
 import AVFoundation
 import Combine
 
-/// Records the microphone (AVAudioRecorder) and, for meetings, the system audio
-/// in parallel (SystemAudioCapture) to a second file. The two tracks are mixed
-/// on the server.
+/// Records the microphone and, for meetings, the system audio in parallel
+/// (SystemAudioCapture) to a second file. The two tracks are mixed on the server.
+///
+/// The mic path uses AVCaptureSession rather than AVAudioRecorder so a specific
+/// input device can be chosen; AVAudioRecorder is stuck with the system default.
 @MainActor
 final class AudioRecorder: NSObject, ObservableObject {
     @Published private(set) var isRecording = false
@@ -11,7 +13,8 @@ final class AudioRecorder: NSObject, ObservableObject {
     @Published private(set) var level: Float = 0
     @Published private(set) var capturedSystemAudio = false
 
-    private var mic: AVAudioRecorder?
+    private let session = AVCaptureSession()
+    private let fileOutput = AVCaptureAudioFileOutput()
     private var system: SystemAudioCapture?
     private var ticker: Timer?
     private var startedAt: Date?
@@ -23,20 +26,37 @@ final class AudioRecorder: NSObject, ObservableObject {
     /// - Parameters:
     ///   - micURL: where the mic track goes
     ///   - systemURL: if non-nil, also capture system audio here (meetings)
-    func start(micURL: URL, systemURL: URL?) async throws {
+    ///   - deviceID: input device uniqueID; "" / unknown = system default
+    func start(micURL: URL, systemURL: URL?, deviceID: String = "") async throws {
         try FileManager.default.createDirectory(
             at: micURL.deletingLastPathComponent(), withIntermediateDirectories: true)
+        try? FileManager.default.removeItem(at: micURL)
 
-        let settings: [String: Any] = [
-            AVFormatIDKey: kAudioFormatMPEG4AAC,
-            AVSampleRateKey: 48_000,
-            AVNumberOfChannelsKey: 1,
-            AVEncoderAudioQualityKey: AVAudioQuality.high.rawValue,
-        ]
-        let rec = try AVAudioRecorder(url: micURL, settings: settings)
-        rec.isMeteringEnabled = true
-        guard rec.record() else { throw RecorderError.couldNotStart }
-        mic = rec
+        let device = MicDevices.device(for: deviceID) ?? AVCaptureDevice.default(for: .audio)
+        guard let device, let input = try? AVCaptureDeviceInput(device: device) else {
+            throw RecorderError.couldNotStart
+        }
+
+        session.beginConfiguration()
+        session.inputs.forEach(session.removeInput)
+        session.outputs.forEach(session.removeOutput)
+        guard session.canAddInput(input) else {
+            session.commitConfiguration(); throw RecorderError.couldNotStart
+        }
+        session.addInput(input)
+        guard session.canAddOutput(fileOutput) else {
+            session.commitConfiguration(); throw RecorderError.couldNotStart
+        }
+        session.addOutput(fileOutput)
+        session.commitConfiguration()
+
+        await withCheckedContinuation { cont in
+            DispatchQueue.global(qos: .userInitiated).async {
+                self.session.startRunning()
+                cont.resume()
+            }
+        }
+        fileOutput.startRecording(to: micURL, outputFileType: .m4a, recordingDelegate: self)
 
         capturedSystemAudio = false
         if let systemURL {
@@ -46,12 +66,12 @@ final class AudioRecorder: NSObject, ObservableObject {
                 system = cap
                 capturedSystemAudio = true
             } catch {
-                // fall back to mic-only rather than failing the whole recording
                 NSLog("system audio unavailable: \(error.localizedDescription)")
             }
         }
 
         startedAt = .now
+        elapsed = 0
         isRecording = true
         ticker = Timer.scheduledTimer(withTimeInterval: 0.1, repeats: true) { [weak self] _ in
             Task { @MainActor in self?.tick() }
@@ -62,25 +82,45 @@ final class AudioRecorder: NSObject, ObservableObject {
     @discardableResult
     func stop() async -> TimeInterval {
         ticker?.invalidate(); ticker = nil
-        mic?.stop()
+        if fileOutput.isRecording {
+            await withCheckedContinuation { cont in
+                stopContinuation = cont
+                fileOutput.stopRecording()
+            }
+        }
+        session.stopRunning()
         await system?.stop()
         let d = startedAt.map { Date().timeIntervalSince($0) } ?? elapsed
-        mic = nil; system = nil
+        system = nil
         isRecording = false
         level = 0
         return d
     }
 
+    private var stopContinuation: CheckedContinuation<Void, Never>?
+
     private func tick() {
-        guard let rec = mic, let start = startedAt else { return }
+        guard let start = startedAt else { return }
         elapsed = Date().timeIntervalSince(start)
-        rec.updateMeters()
-        let db = rec.averagePower(forChannel: 0)
-        level = max(0, min(1, (db + 55) / 55))
+        if let ch = fileOutput.connection(with: .audio)?.audioChannels.first {
+            level = max(0, min(1, (ch.averagePowerLevel + 55) / 55))
+        }
     }
 
     enum RecorderError: LocalizedError {
         case couldNotStart
         var errorDescription: String? { "Aufnahme konnte nicht gestartet werden." }
+    }
+}
+
+extension AudioRecorder: AVCaptureFileOutputRecordingDelegate {
+    nonisolated func fileOutput(_ output: AVCaptureFileOutput,
+                                didFinishRecordingTo outputFileURL: URL,
+                                from connections: [AVCaptureConnection],
+                                error: Error?) {
+        Task { @MainActor in
+            stopContinuation?.resume()
+            stopContinuation = nil
+        }
     }
 }

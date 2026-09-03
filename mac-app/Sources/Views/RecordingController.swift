@@ -17,6 +17,9 @@ final class RecordingController: ObservableObject {
     private var activeSession: Session?
     private var videoCapture: WindowVideoCapture?
 
+    /// Set by the app so begin() can read the chosen input device + speaker count.
+    var settings: AppSettings?
+
     init(store: SessionStore, transcriber: Transcriber, recorder: AudioRecorder) {
         self.store = store
         self.transcriber = transcriber
@@ -24,7 +27,7 @@ final class RecordingController: ObservableObject {
     }
 
     func begin(kind: SessionKind, title: String, wantsSystemAudio: Bool,
-               videoWindow: SCWindow? = nil) async {
+               speakerCount: Int = 0, videoWindow: SCWindow? = nil) async {
         notice = nil
         guard await AudioRecorder.requestMicPermission() else {
             notice = "Mikrofonzugriff verweigert – in den Systemeinstellungen erlauben."
@@ -38,13 +41,15 @@ final class RecordingController: ObservableObject {
 
         var s = Session(kind: kind, title: title)
         s.status = .recording
+        s.speakerCount = speakerCount
         store.save(s)
         activeSession = s
 
         do {
             try await recorder.start(
                 micURL: store.audioURL(for: s.id),
-                systemURL: useSystem ? store.systemAudioURL(for: s.id) : nil)
+                systemURL: useSystem ? store.systemAudioURL(for: s.id) : nil,
+                deviceID: settings?.micDeviceID ?? "")
         } catch {
             notice = error.localizedDescription
             store.delete(s)
@@ -67,6 +72,30 @@ final class RecordingController: ObservableObject {
                 notice = "Video konnte nicht aufgenommen werden – Audio läuft weiter."
             }
         }
+    }
+
+    /// Bring an existing audio or video file into the library and transcribe it.
+    /// A video file is kept as the session's video track too, so it plays back.
+    func importFile(_ url: URL, kind: SessionKind, title: String, speakerCount: Int) {
+        let isVideo = ["mp4", "mov", "m4v"].contains(url.pathExtension.lowercased())
+        var s = Session(kind: kind, title: title.isEmpty ? url.deletingPathExtension().lastPathComponent : title)
+        s.speakerCount = speakerCount
+        s.status = .uploading
+        store.save(s)
+        do {
+            try FileManager.default.createDirectory(at: store.dir(for: s.id), withIntermediateDirectories: true)
+            let dest = isVideo ? store.videoURL(for: s.id) : store.audioURL(for: s.id)
+            try? FileManager.default.removeItem(at: dest)
+            try FileManager.default.copyItem(at: url, to: dest)
+            s.hasVideo = isVideo
+            store.save(s)
+        } catch {
+            s.status = .error
+            s.errorMessage = "Datei konnte nicht importiert werden: \(error.localizedDescription)"
+            store.save(s)
+            return
+        }
+        transcriber.startProcessing(s)
     }
 
     /// Flag the current moment — jumpable in the transcript afterwards.

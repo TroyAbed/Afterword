@@ -50,6 +50,8 @@ struct Session: Codable, Identifiable, Hashable {
     var status: SessionStatus
     var hasSystemAudio: Bool = false
     var hasVideo: Bool = false
+    /// how many speakers to force in diarisation. 0 = let pyannote decide.
+    var speakerCount: Int = 0
     /// seconds from the start of the recording where you pressed "merken"
     var markers: [TimeInterval] = []
     var serverJobID: String?
@@ -101,8 +103,8 @@ struct Session: Codable, Identifiable, Hashable {
 
     enum CodingKeys: String, CodingKey {
         case id, kind, title, createdAt, duration, status, hasSystemAudio, hasVideo,
-             markers, serverJobID, transcriptMarkdown, summaryMarkdown, segments,
-             speakers, speakerNames, language, errorMessage
+             speakerCount, markers, serverJobID, transcriptMarkdown, summaryMarkdown,
+             segments, speakers, speakerNames, language, errorMessage
     }
 
     init(from decoder: Decoder) throws {
@@ -115,6 +117,7 @@ struct Session: Codable, Identifiable, Hashable {
         status = try c.decodeIfPresent(SessionStatus.self, forKey: .status) ?? .done
         hasSystemAudio = try c.decodeIfPresent(Bool.self, forKey: .hasSystemAudio) ?? false
         hasVideo = try c.decodeIfPresent(Bool.self, forKey: .hasVideo) ?? false
+        speakerCount = try c.decodeIfPresent(Int.self, forKey: .speakerCount) ?? 0
         markers = try c.decodeIfPresent([TimeInterval].self, forKey: .markers) ?? []
         serverJobID = try c.decodeIfPresent(String.self, forKey: .serverJobID)
         transcriptMarkdown = try c.decodeIfPresent(String.self, forKey: .transcriptMarkdown)
@@ -136,6 +139,7 @@ struct Session: Codable, Identifiable, Hashable {
         try c.encode(status, forKey: .status)
         try c.encode(hasSystemAudio, forKey: .hasSystemAudio)
         try c.encode(hasVideo, forKey: .hasVideo)
+        try c.encode(speakerCount, forKey: .speakerCount)
         try c.encode(markers, forKey: .markers)
         try c.encodeIfPresent(serverJobID, forKey: .serverJobID)
         try c.encodeIfPresent(transcriptMarkdown, forKey: .transcriptMarkdown)

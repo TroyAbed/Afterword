@@ -9,6 +9,7 @@ struct AfterwordApp: App {
     @StateObject private var controller: RecordingController
     @StateObject private var watcher: MeetingWatcher
     @StateObject private var navigator = Navigator()
+    @StateObject private var mics = MicDevices()
 
     init() {
         let store = SessionStore()
@@ -16,6 +17,7 @@ struct AfterwordApp: App {
         let transcriber = Transcriber(store: store, settings: settings)
         let recorder = AudioRecorder()
         let controller = RecordingController(store: store, transcriber: transcriber, recorder: recorder)
+        controller.settings = settings
         let watcher = MeetingWatcher(calendar: MeetingCalendar(), controller: controller,
                                      recorder: recorder, settings: settings)
         _store = StateObject(wrappedValue: store)
@@ -35,6 +37,7 @@ struct AfterwordApp: App {
             .environmentObject(controller)
             .environmentObject(watcher)
             .environmentObject(navigator)
+            .environmentObject(mics)
     }
 
     private var menuBarIcon: String {

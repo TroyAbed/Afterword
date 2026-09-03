@@ -570,9 +570,29 @@ struct SpeakerNames: View {
                 Text("Namen erscheinen sofort auch im Protokoll. Stimme merken erkennt die Person in künftigen Aufnahmen automatisch.")
                     .font(.caption2).foregroundStyle(.tertiary)
             }
+
+            Divider().padding(.vertical, 2)
+            HStack(spacing: 8) {
+                Text("Falsche Sprecherzahl?").font(.caption).foregroundStyle(.secondary)
+                Picker("", selection: $reCount) {
+                    Text("Automatisch").tag(0)
+                    ForEach(1...8, id: \.self) { Text("\($0)").tag($0) }
+                }
+                .labelsHidden().fixedSize()
+                Button("Neu transkribieren") {
+                    guard var cur = store.session(session.id) else { return }
+                    cur.speakerCount = reCount
+                    store.save(cur)
+                    transcriber.retry(session.id)
+                }
+                .controlSize(.small)
+                .disabled(reCount == session.speakerCount)
+            }
         }
-        .task { transcriber.loadVoices() }
+        .task { transcriber.loadVoices(); reCount = session.speakerCount }
     }
+
+    @State private var reCount = 0
 
     @ViewBuilder
     private func voiceMenu(for tag: String) -> some View {

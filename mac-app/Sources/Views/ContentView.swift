@@ -5,6 +5,7 @@ struct ContentView: View {
     @Environment(\.palette) private var palette
     @State private var selection: UUID?
     @State private var recording = false
+    @State private var importing = false
 
     var body: some View {
         NavigationSplitView {
@@ -23,17 +24,26 @@ struct ContentView: View {
         }
         .toolbar {
             ToolbarItem(placement: .primaryAction) {
-                Button { recording = true } label: {
+                Menu {
+                    Button("Aufnehmen", systemImage: "record.circle") { recording = true }
+                    Button("Datei importieren …", systemImage: "square.and.arrow.down") { importing = true }
+                } label: {
                     Label("Aufnehmen", systemImage: "record.circle")
+                } primaryAction: {
+                    recording = true
                 }
+                .menuStyle(.button)
                 .buttonStyle(.borderedProminent)
                 .tint(palette.accent)
                 .foregroundStyle(palette.onAccent)
-                .help("Neue Aufnahme")
+                .help("Aufnehmen oder eine Datei importieren")
             }
         }
         .sheet(isPresented: $recording) {
             RecordingView { newID in selection = newID }
+        }
+        .sheet(isPresented: $importing) {
+            ImportView { newID in selection = newID }
         }
     }
 
@@ -43,7 +53,7 @@ struct ContentView: View {
             Text("Keine Aufnahme gewählt")
                 .font(Brand.display(17))
                 .foregroundStyle(palette.ink)
-            Text("Nimm ein Meeting oder eine Voice Note auf.")
+            Text("Nimm ein Meeting oder eine Voice Note auf — oder importiere eine Datei.")
                 .font(Brand.body(12)).foregroundStyle(palette.muted)
         }
     }

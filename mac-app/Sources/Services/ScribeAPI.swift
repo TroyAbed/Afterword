@@ -54,7 +54,8 @@ struct ScribeAPI {
     /// Upload the mic track (and, for meetings, the system-audio track); returns the created job.
     func submit(audio: URL, systemAudio: URL?, kind: SessionKind,
                 title: String, language: String,
-                summaryModel: String, ollamaURL: String) async throws -> JobMeta {
+                summaryModel: String, ollamaURL: String,
+                speakerCount: Int, vocab: String) async throws -> JobMeta {
         let boundary = "scribe.\(UUID().uuidString)"
         var req = request("/jobs", method: "POST")
         req.setValue("multipart/form-data; boundary=\(boundary)", forHTTPHeaderField: "Content-Type")
@@ -77,6 +78,8 @@ struct ScribeAPI {
         field("language", language)
         field("summary_model", summaryModel)
         field("ollama_url", ollamaURL)
+        field("speaker_count", String(speakerCount))
+        field("vocab", vocab)
         try file("audio", audio)
         if let systemAudio, FileManager.default.fileExists(atPath: systemAudio.path) {
             try file("system_audio", systemAudio)

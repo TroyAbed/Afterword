@@ -13,6 +13,7 @@ struct RecordingView: View {
     @StateObject private var calendar = MeetingCalendar()
     @State private var kind: SessionKind = .voiceNote
     @State private var title = ""
+    @State private var speakerCount = 0
     @State private var wantsSystemAudio = true
     @State private var recordVideo = false
     @State private var windows: [SCWindow] = []
@@ -79,6 +80,9 @@ struct RecordingView: View {
 
                 TextField("Titel (optional)", text: $title)
                     .textFieldStyle(.roundedBorder)
+
+                MicPicker()
+                SpeakerCountPicker(count: $speakerCount)
 
                 if kind == .meeting {
                     VStack(alignment: .leading, spacing: 8) {
@@ -169,6 +173,7 @@ struct RecordingView: View {
                         Task {
                             await controller.begin(
                                 kind: kind, title: title, wantsSystemAudio: wantsSystemAudio,
+                                speakerCount: speakerCount,
                                 videoWindow: (kind == .meeting && recordVideo) ? selectedWindow : nil)
                         }
                     }

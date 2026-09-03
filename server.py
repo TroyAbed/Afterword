@@ -94,6 +94,8 @@ async def create_job(
     speakers: str = Form("{}"),
     summary_model: str = Form(""),
     ollama_url: str = Form(""),
+    speaker_count: int = Form(0),          # 0 = let pyannote decide
+    vocab: str = Form(""),                 # names / terms to bias the ASR toward
     system_audio: UploadFile | None = File(None),
 ) -> dict:
     jid = datetime.now().strftime("%Y%m%d-%H%M%S-") + secrets.token_hex(3)
@@ -117,6 +119,8 @@ async def create_job(
         "language": language, "speakers": json.loads(speakers or "{}"),
         "summary_model": summary_model or None,
         "ollama_url": ollama_url or None,
+        "speaker_count": speaker_count or None,
+        "vocab": vocab or None,
         "audio": apath.name, "system_audio": spath.name if spath else None,
         "status": "queued", "created_at": _now(),
     }
@@ -231,6 +235,13 @@ def _worker() -> None:
                 cfg["summary"]["ollama_model"] = m["summary_model"]
             if m.get("ollama_url"):
                 cfg["summary"]["ollama_url"] = m["ollama_url"]
+            if m.get("speaker_count"):
+                cfg["transcribe"]["min_speakers"] = m["speaker_count"]
+                cfg["transcribe"]["max_speakers"] = m["speaker_count"]
+            if m.get("vocab"):
+                base = cfg["transcribe"].get("initial_prompt", "")
+                cfg["transcribe"]["initial_prompt"] = (
+                    base + " Namen und Begriffe: " + m["vocab"] + ".").strip()
 
             secondary = d / m["system_audio"] if m.get("system_audio") else None
 

@@ -11,6 +11,7 @@ language = "de"             # de / en / "" for auto-detect
 # max_speakers = 6
 # bias vocabulary — helps with CH terms and recurring names it keeps mis-spelling
 initial_prompt = "Gespräch auf Deutsch mit Schweizer Bezug: Alp, Älpler, Sennerei, kWp, Dachpacht, Photovoltaik."
+# the app appends its "Namen & Begriffe" list + saved voice names per job
 
 [summary]
 ollama_url = "http://localhost:11434"   # default; the app can override this per job

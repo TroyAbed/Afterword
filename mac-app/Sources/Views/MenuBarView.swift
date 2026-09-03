@@ -11,6 +11,7 @@ struct MenuBarView: View {
 
     @State private var kind: SessionKind = .voiceNote
     @State private var wantsSystemAudio = true
+    @State private var speakerCount = 0
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
@@ -66,9 +67,14 @@ struct MenuBarView: View {
                         .toggleStyle(.checkbox).font(.callout)
                 }
 
+                MicPicker(compact: true).labelsHidden().font(.callout)
+                SpeakerCountPicker(count: $speakerCount, compact: true)
+                    .labelsHidden().font(.callout)
+
                 Button {
                     Task { await controller.begin(kind: kind, title: "",
-                                                  wantsSystemAudio: wantsSystemAudio) }
+                                                  wantsSystemAudio: wantsSystemAudio,
+                                                  speakerCount: speakerCount) }
                 } label: {
                     Label("Aufnehmen", systemImage: "record.circle").frame(maxWidth: .infinity)
                 }

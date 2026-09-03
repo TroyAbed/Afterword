@@ -17,6 +17,17 @@ final class Transcriber: ObservableObject {
         return ScribeAPI(baseURL: url, token: settings.token)
     }
 
+    /// The vocabulary hint sent with every job: the user's list plus the names
+    /// of every saved voice (so recurring people get spelled right).
+    private var vocabHint: String {
+        let names = voices.map(\.name)
+        let parts = ([settings.vocabulary] + names)
+            .flatMap { $0.split(whereSeparator: { ",;\n".contains($0) }) }
+            .map { $0.trimmingCharacters(in: .whitespaces) }
+            .filter { !$0.isEmpty }
+        return Array(Set(parts)).sorted().joined(separator: ", ")
+    }
+
     /// Register a just-finished recording and kick off processing.
     func startProcessing(_ session: Session) {
         var s = session
@@ -131,14 +142,19 @@ final class Transcriber: ObservableObject {
     private func attemptRun(_ id: UUID) async -> Bool {
         guard let api else { await fail(id, "Server-URL in den Einstellungen fehlt"); return true }
         guard var s = store.session(id) else { return true }
-        let audio = store.audioURL(for: id)
+        // an imported video has no separate audio file — send the video itself,
+        // the server extracts the audio with ffmpeg
+        let audioPath = store.audioURL(for: id)
+        let audio = FileManager.default.fileExists(atPath: audioPath.path)
+            ? audioPath : store.videoURL(for: id)
 
         do {
             let sysURL = s.hasSystemAudio ? store.systemAudioURL(for: id) : nil
             let created = try await api.submit(
                 audio: audio, systemAudio: sysURL, kind: s.kind,
                 title: s.title, language: settings.language,
-                summaryModel: settings.summaryModel, ollamaURL: settings.ollamaURL)
+                summaryModel: settings.summaryModel, ollamaURL: settings.ollamaURL,
+                speakerCount: s.speakerCount, vocab: vocabHint)
             s.serverJobID = created.id
             s.status = .processing
             store.save(s)
