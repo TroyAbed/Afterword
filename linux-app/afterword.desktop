@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=Afterword
+Comment=Local meeting transcription
+Exec=afterword
+Icon=afterword
+Terminal=false
+Categories=AudioVideo;Audio;Utility;

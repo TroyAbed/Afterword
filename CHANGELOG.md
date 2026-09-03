@@ -1,5 +1,13 @@
 # Changelog
 
+## Unveröffentlicht
+
+- **Linux-Client** (`linux-app/`, PySide6/Qt) — für CachyOS/Arch per `makepkg -si`.
+  Aufnahme (Mikro + Systemton über PipeWire), Import, Bibliothek, Transkript mit
+  Klick-zum-Springen, Sprecher-Benennung, Export. Kein Fenster-Video, kein Kalender.
+- Ein halb eingetippter „Ollama-Server"-Wert wird ignoriert statt jede
+  Zusammenfassung mit einem DNS-Fehler abzubrechen.
+
 ## 0.3
 
 **Aufnahme**

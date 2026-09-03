@@ -112,6 +112,26 @@ every render (`Session.applySpeakerNames`) — instant, no LLM re-run. This was 
 user's idea and it is better than the resummarize approach. `resummarize` is kept
 as a manual escape hatch (after transcript edits, or a failed summary).
 
+## 3b. The Linux client (`linux-app/`)
+
+PySide6 (Qt 6), Python — same server, same API, no Qt-less parts shared with
+`client.py` (kept separate; `linux-app/` is self-contained). Three modules:
+`core.py` (config as `~/.config/afterword/config.json`, `Session` dataclass +
+disk store under `~/.local/share/afterword/sessions/`, `ScribeAPI`), `recorder.py`
+(mic + monitor via `ffmpeg -f pulse`, sources from `pactl`), `app.py` (the Qt UI
+— `QThread` workers for upload/poll/resummarize/mix, kept in `MainWindow._threads`
+and re-kicked by a 5 s `_poll_busy`; playback via `QMediaPlayer`, mic+system mixed
+lazily off-thread into `mixed.m4a`).
+
+Has: record (mic + system audio), import, library, transcript with click-to-seek,
+speaker naming, speaker-count re-transcribe, resummarize, `.md`/`.srt` export,
+settings. Does **not** have: window video, calendar, tray, colorways.
+
+Ships a `PKGBUILD` (Arch — `makepkg -si`, deps `python-pyside6 ffmpeg libpulse`),
+a `run.sh` (venv fallback), `afterword.desktop`. Target is the brother's CachyOS
+box. **Not tested on Linux from this repo's Mac build machine** — the brother is
+the first runner.
+
 ## 4. The app (`mac-app/`)
 
 SwiftUI, macOS 14+, sandboxed, **universal binary** (build machine is Intel —

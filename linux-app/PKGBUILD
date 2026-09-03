@@ -1,0 +1,27 @@
+# Maintainer: build locally from the repo checkout — run `makepkg -si` in this dir.
+pkgname=afterword
+pkgver=0.3.0
+pkgrel=1
+pkgdesc="Local meeting transcription — Linux desktop client"
+arch=('any')
+url="https://github.com/TroyAbed/Afterword"
+license=('custom')
+depends=('python' 'python-pyside6' 'ffmpeg' 'libpulse')
+optdepends=('pipewire-pulse: system-audio capture from the default output')
+source=()
+
+package() {
+  cd "$startdir"
+  install -d "$pkgdir/usr/share/afterword"
+  cp -r afterword "$pkgdir/usr/share/afterword/"
+
+  install -d "$pkgdir/usr/bin"
+  cat > "$pkgdir/usr/bin/afterword" <<'SH'
+#!/bin/sh
+exec python -c "import sys; sys.path.insert(0, '/usr/share/afterword'); from afterword.app import main; main()" "$@"
+SH
+  chmod 755 "$pkgdir/usr/bin/afterword"
+
+  install -Dm644 afterword.desktop "$pkgdir/usr/share/applications/afterword.desktop"
+  install -Dm644 "$srcdir/../README.md" "$pkgdir/usr/share/doc/afterword/README.md" 2>/dev/null || true
+}
